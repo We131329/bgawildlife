@@ -1,0 +1,33 @@
+# BGA - WildLife .gitignore
+
+# IDE settings
+.vscode/
+.idea/
+.project
+.settings/
+.buildpath
+
+# SFTP settings
+sftp.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# BGA Helper files (for IDE autocompletion, usually not needed in repo)
+_ide_helper.php
+bga-framework.d.ts
+
+# Node.js
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Sass / CSS maps
+*.css.map
+.sass-cache/
+
+# Backups and temp files
+*.bak
+*.swp
+*~
