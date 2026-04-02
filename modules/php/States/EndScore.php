@@ -58,6 +58,6 @@ class EndScore extends \Bga\GameFramework\States\GameState
 
         $this->bga->notify->all("gameEnd", clienttranslate('Game over! Final scores are tallied.'), []);
 
-        return 99;
+        return ST_END_GAME;
     }
 }

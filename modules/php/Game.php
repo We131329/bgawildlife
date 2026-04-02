@@ -11,6 +11,7 @@ namespace Bga\Games\WildLife;
 
 use Bga\Games\WildLife\States\PlayerTurn;
 use Bga\Games\WildLife\States\NewCycle;
+use Bga\Games\WildLife\States\MulliganPhase;
 
 class Game extends \Bga\GameFramework\Table
 {
@@ -252,7 +253,7 @@ class Game extends \Bga\GameFramework\Table
             self::$CARD_TYPES["hunter_{$arg}"] = [
                 'card_type' => 'hunter',
                 'card_type_arg' => $arg,
-                'name' => $img,
+                'name' => clienttranslate('Cazador'),
                 'category' => 'aggressor',
                 'image' => "cards/threats/{$img}.jpg",
             ];
@@ -544,7 +545,7 @@ class Game extends \Bga\GameFramework\Table
         $firstPlayerId = (int)$this->getActivePlayerId();
         $this->setGameStateInitialValue(self::GV_FIRST_PLAYER, $firstPlayerId);
 
-        return NewCycle::class;
+        return MulliganPhase::class;
     }
 
     /**

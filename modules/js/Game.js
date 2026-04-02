@@ -49,6 +49,75 @@ function getCardTypeInfo(cardTypes, card) {
 }
 
 // ============================================================
+// State: MulliganPhase
+// ============================================================
+class MulliganPhase {
+    constructor(game, bga) {
+        this.game = game;
+        this.bga = bga;
+    }
+
+    onEnteringState(args, isCurrentPlayerActive) {
+        this.bga.statusBar.removeActionButtons();
+        const isFirstPlayer = this.bga.players.getCurrentPlayerId() == args.firstPlayerId;
+        const status = args.mulliganStatus[this.bga.players.getCurrentPlayerId()];
+
+        if (isCurrentPlayerActive && status == 0) {
+            this.game.selectedCards.clear();
+            
+            if (isFirstPlayer) {
+                this.bga.statusBar.setTitle(_('${you}: Select 1-6 cards to mulligan, or accept your hand'));
+                this.game.enableMulliganSelection(6); // Max 6
+            } else {
+                this.bga.statusBar.setTitle(_('${you}: Mulligan ALL your cards, or accept your hand'));
+                // For others, clicking Mulligan just selects all
+            }
+
+            this.bga.statusBar.addActionButton(
+                _('Mulligan'),
+                () => this.onMulliganClick(isFirstPlayer),
+                { color: 'red', id: 'btn_mulligan' }
+            );
+
+            this.bga.statusBar.addActionButton(
+                _('Accept Hand'),
+                () => this.bga.actions.performAction("actAcceptHand"),
+                { color: 'blue', id: 'btn_accept_hand' }
+            );
+        } else {
+            this.bga.statusBar.setTitle(_('Waiting for other players to finish their mulligans'));
+            this.game.disableCardSelection();
+        }
+    }
+
+    onMulliganClick(isFirstPlayer) {
+        if (!isFirstPlayer) {
+            // Select all cards automatically for non-first player
+            const allIds = Array.from(document.querySelectorAll('.wl-hand-card')).map(el => parseInt(el.dataset.cardId));
+            this.bga.actions.performAction("actMulligan", { cardIds: allIds });
+            return;
+        }
+
+        // First player needs to have selected cards
+        if (this.game.selectedCards.size === 0) {
+            this.bga.dialogs.showMessage(_('Select at least one card to mulligan'), 'error');
+            return;
+        }
+        
+        const cardIds = Array.from(this.game.selectedCards);
+        this.bga.actions.performAction("actMulligan", { cardIds: cardIds });
+    }
+
+    onLeavingState(args, isCurrentPlayerActive) {
+        this.game.disableCardSelection();
+    }
+
+    onPlayerActivationChange(args, isCurrentPlayerActive) {
+        this.onEnteringState(args, isCurrentPlayerActive);
+    }
+}
+
+// ============================================================
 // State: PlayerTurn
 // ============================================================
 class PlayerTurn {
@@ -137,6 +206,9 @@ export class Game {
         this.bga = bga;
 
         // Register states
+        this.mulliganPhase = new MulliganPhase(this, bga);
+        this.bga.states.register('MulliganPhase', this.mulliganPhase);
+
         this.playerTurn = new PlayerTurn(this, bga);
         this.bga.states.register('PlayerTurn', this.playerTurn);
 
@@ -340,6 +412,27 @@ export class Game {
     // Card Selection / Interaction
     // ============================================================
 
+    enableMulliganSelection(maxCards) {
+        this.selectedCards.clear();
+        document.querySelectorAll('.wl-hand-card').forEach(el => {
+            el.classList.add('wl-selectable');
+            el.classList.remove('wl-dimmed', 'wl-selected');
+            el.onclick = () => this.onMulliganCardClick(parseInt(el.dataset.cardId), el, maxCards);
+        });
+    }
+
+    onMulliganCardClick(cardId, el, maxCards) {
+        if (this.selectedCards.has(cardId)) {
+            this.selectedCards.delete(cardId);
+            el.classList.remove('wl-selected');
+        } else {
+            if (this.selectedCards.size < maxCards) {
+                this.selectedCards.add(cardId);
+                el.classList.add('wl-selected');
+            }
+        }
+    }
+
     enableCardSelection(args) {
         this.currentArgs = args;
         this.discardMode = false;
@@ -502,7 +595,7 @@ export class Game {
 
     confirmDiscard() {
         if (this.currentArgs.mustDiscard && this.selectedCards.size !== this.discardTarget) {
-            this.bga.statusBar.showMessage(_('Select exactly ${n} card(s) to discard').replace('${n}', this.discardTarget), 'error');
+            this.bga.dialogs.showMessage(_('Select exactly ${n} card(s) to discard').replace('${n}', this.discardTarget), 'error');
             return;
         }
         const cardIds = Array.from(this.selectedCards).join(',');
@@ -629,7 +722,16 @@ export class Game {
 
     setupNotifications() {
         console.log('Wild Life notifications setup');
-        this.bga.notifications.setupPromiseNotifications({});
+        this.bga.notifications.setupPromiseNotifications({
+            mulliganResult: 500
+        });
+    }
+
+    async notif_mulliganResult(args) {
+        if (args.hand) {
+            this.gamedatas.hand = args.hand;
+            this.renderHand(args.hand);
+        }
     }
 
     async notif_newCycle(args) {

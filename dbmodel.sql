@@ -7,6 +7,9 @@
 -- See http://en.boardgamearena.com/#!doc/Studio for more information.
 -- -----
 
+-- Standard BGA player table
+ALTER TABLE `player` ADD `player_mulligan_status` TINYINT UNSIGNED NOT NULL DEFAULT 0;
+
 -- Card table used with the Deck component
 CREATE TABLE IF NOT EXISTS `card` (
   `card_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

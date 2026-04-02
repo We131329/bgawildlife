@@ -388,19 +388,22 @@ class PlayerTurn extends GameState
 
         return NextPlayer::class;
     }
-
-    /**
-     * Validate that a card is in the player's hand and is playable
-     */
-    private function validateCardInHand(array $card, int $playerId, array $args): void
-    {
-        if (!$card || $card['location'] !== 'hand' || (int)$card['location_arg'] !== $playerId) {
-            throw new UserException('This card is not in your hand');
-        }
-        if (!in_array((int)$card['id'], $args['playableCardIds'] ?? [])) {
-            throw new UserException('This card cannot be played right now');
-        }
+/**
+ * Validate if a card can be played by the player
+ */
+private function validateCardInHand(array $card, int $playerId, array $args)
+{
+    if ($card['location'] !== 'hand' || (int)$card['location_arg'] !== $playerId) {
+        throw new UserException('This card is not in your hand');
     }
+
+    // Use RulesEngine for category-specific validation
+    \Bga\Games\WildLife\RulesEngine::validatePlay($this->game, $playerId, $card);
+
+    if (!in_array((int)$card['id'], $args['playableCardIds'] ?? [])) {
+        throw new UserException('This card cannot be played right now');
+    }
+}
 
     function zombie(int $playerId) {
         // Zombie: play a random playable card or pass

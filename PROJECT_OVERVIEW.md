@@ -14,6 +14,7 @@ This project is a BGA implementation of "WildLife". Players compete over a serie
 ## Technical Architecture
 - **Framework**: Modern BGA PHP framework using namespaces and State-pattern classes.
 - **State Machine**:
+    - `MulliganPhase`: Simultaneous start where players can redraw their initial hand.
     - `NewCycle`: Handles turn rotation and cycle setup.
     - `DrawPhase`: Players refill their hands to 6 cards.
     - `PlayerTurn`: The active player plays or discards 3 cards.
@@ -21,33 +22,31 @@ This project is a BGA implementation of "WildLife". Players compete over a serie
     - `EndCycle`: Calculates habitat scores and manages temporary card removal.
     - `EndScore`: Final tiebreaker logic using encoded cycle history.
 
-## Suggested Improvements
+## Completed Improvements
 
-### 1. Centralize Data Mappings
-The mapping between Life Type integers (1-4) and strings (`small_life`, etc.) is currently hardcoded inside both `ReactProtector.php` and `PlayerTurn.php`. 
-- **Action**: Move `$lifeTypeMap` to a constant or a static method in `Game.php` to ensure consistency and easier maintenance.
+### 1. Centralize Data Mappings (Completed)
+Mappings between Life Type integers and strings are centralized in `Game.php` using `LIFE_TYPE_TO_ID` and `ID_TO_LIFE_TYPE` constants.
 
-### 2. Standardize State Transitions
-Most states return class references (e.g., `return PlayerTurn::class;`), but `EndScore.php` returns a numeric constant `ST_END_GAME`.
-- **Action**: Update the state machine to use class-based references consistently if the framework version supports it, or ensure `ST_END_GAME` is correctly mapped in `states.inc.php`.
+### 2. Standardize State Transitions (Completed)
+State transitions use class-based references or constants consistently.
 
-### 3. Tiebreaker Integer Safety
-In `EndScore.php`, the tiebreaker `player_score_aux` is calculated by multiplying cycle scores by 1000^n. 
-- **Risk**: While PHP handles 64-bit integers, very long games with high scores could theoretically approach `PHP_INT_MAX`. 
-- **Action**: Add a check or use a slightly more compact encoding if the number of cycles increases.
+### 3. Tiebreaker Integer Safety (Verified)
+The tiebreaker uses a base-128 encoding to fit safely within a 32-bit signed integer.
 
-### 4. Code Reuse in Aggression Logic
-The logic for removing life cards and their associated enhancers is duplicated in `executeCatastrophe` and `executeHunter`.
-- **Action**: Create a helper method in `Game.php` called `discardLifeAndEnhancers($playerId, $lifeTypes)` to handle the removal and notification logic in one place.
+### 4. Code Reuse in Aggression Logic (Completed)
+Centralized logic for card removal in `discardLifeAndEnhancers()`.
 
-### 5. Translation Consistency
-Some strings like "Lluvia" (Rain) are hardcoded in Spanish in the `Game.php` definitions, while others use `clienttranslate`.
-- **Action**: Ensure all user-facing names in `self::$CARD_TYPES` are wrapped in `totranslate()` or `clienttranslate()` to support BGA's multi-language features.
+### 5. Translation Consistency (Completed)
+All user-facing strings are wrapped in `clienttranslate()`.
 
-### 6. Validation Logic
-In `PlayerTurn.php`, `validateCardInHand` is a great start. 
-- **Action**: Consider moving specific "Playability" rules (like needing a life card before an enhancer) into a dedicated `RulesEngine` trait or class to keep the State classes slim.
+### 6. Validation Logic (Completed)
+Playability rules are centralized in the `RulesEngine` class.
 
-### 7. Global Values
-`GV_ACTIVE_TURN_PLAYER` is set but not heavily used compared to the framework's `getActivePlayerId`. 
-- **Action**: Verify if this is redundant or if it's intended to track the "Main" active player during reactive states.
+### 7. Global Values (Verified)
+`GV_ACTIVE_TURN_PLAYER` tracks the primary active player during multi-action turns.
+
+### 8. Mulligan Feature (New)
+At the start of the game:
+- **First Player**: Can choose 1-6 cards to discard and replace.
+- **Other Players**: Can choose to replace their entire 6-card hand or keep it.
+- **Simultaneous**: All players decide at once to keep the game fast.
