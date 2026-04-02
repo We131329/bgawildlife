@@ -1,0 +1,46 @@
+{
+    "table": {
+        "cycles_played": {
+            "id": 10,
+            "name": "Cycles played",
+            "type": "int"
+        }
+    },
+    "player": {
+        "life_cards_played": {
+            "id": 10,
+            "name": "Life cards played",
+            "type": "int"
+        },
+        "enhancers_played": {
+            "id": 11,
+            "name": "Enhancers played",
+            "type": "int"
+        },
+        "predators_played": {
+            "id": 12,
+            "name": "Predators played",
+            "type": "int"
+        },
+        "hunters_played": {
+            "id": 13,
+            "name": "Hunters played",
+            "type": "int"
+        },
+        "catastrophes_played": {
+            "id": 14,
+            "name": "Catastrophes played",
+            "type": "int"
+        },
+        "protectors_used": {
+            "id": 15,
+            "name": "Protectors used",
+            "type": "int"
+        },
+        "highest_cycle_score": {
+            "id": 16,
+            "name": "Highest cycle score",
+            "type": "int"
+        }
+    }
+}

@@ -1,0 +1,347 @@
+/**
+ * Wild Life: The Card Game - CSS Stylesheet
+ */
+
+/* ============================================================
+   Game Info Bar
+   ============================================================ */
+
+#wl-game-info {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #4a7c3f, #6aa84f);
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#wl-game-info span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ============================================================
+   Habitat Zones
+   ============================================================ */
+
+#wl-habitats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.wl-opponent-habitat {
+    flex: 1;
+    min-width: 300px;
+    max-width: 500px;
+    background: #f5f0e8;
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border: 2px solid #d4c9a8;
+}
+
+.wl-habitat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    border-bottom: 3px solid;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.wl-habitat-score {
+    font-weight: bold;
+    color: #6aa84f;
+    font-size: 15px;
+}
+
+.wl-habitat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    min-height: 100px;
+}
+
+.wl-habitat-column {
+    background: rgba(106, 168, 79, 0.08);
+    border: 1px dashed rgba(106, 168, 79, 0.3);
+    border-radius: 6px;
+    padding: 4px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.wl-habitat-extras {
+    grid-column: 1 / span 4;
+    flex-direction: row !important;
+    justify-content: center;
+    flex-wrap: wrap;
+    min-height: 60px !important;
+}
+
+.wl-col-label {
+    font-size: 10px;
+    font-weight: bold;
+    color: #666;
+    text-align: center;
+    padding: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+/* My Habitat - larger */
+#wl-my-habitat-wrapper {
+    margin-bottom: 20px;
+}
+
+#wl-my-habitat-title {
+    text-align: center;
+    color: #4a7c3f;
+    font-size: 18px;
+    margin: 0 0 8px 0;
+}
+
+#wl-my-habitat {
+    background: linear-gradient(135deg, #f0f7e8, #e8f0e0);
+    border: 3px solid #6aa84f;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.wl-my-grid {
+    min-height: 150px;
+}
+
+.wl-my-col {
+    min-height: 140px;
+}
+
+.wl-my-col .wl-col-label {
+    font-size: 12px;
+}
+
+/* ============================================================
+   Cards
+   ============================================================ */
+
+.wl-card, .wl-card-small {
+    position: relative;
+    border-radius: 6px;
+    border: 3px solid #999;
+    background: white;
+    overflow: hidden;
+    cursor: default;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.wl-card {
+    width: 120px;
+    height: 90px;
+}
+
+.wl-card-small {
+    width: 80px;
+    height: 60px;
+}
+
+.wl-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.wl-card-small .wl-card-img {
+    width: 100%;
+    height: 100%;
+}
+
+.wl-card-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    padding: 4px;
+    color: #555;
+    background: #f9f9f9;
+}
+
+/* Card type color borders */
+.wl-card-life { border-color: #6aa84f; }
+.wl-card-enhancer { border-color: #b8860b; }
+.wl-card-rain { border-color: #5bb5b5; }
+.wl-card-protector { border-color: #e94190; }
+.wl-card-aggressor { border-color: #cc0000; }
+.wl-card-catastrophe { border-color: #1a1a1a; }
+
+/* Points indicator */
+.wl-card-points {
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    font-size: 10px;
+    background: rgba(255,255,255,0.85);
+    padding: 1px 3px;
+    border-radius: 3px;
+    line-height: 1;
+}
+
+.wl-card-small .wl-card-points {
+    font-size: 8px;
+    bottom: 1px;
+    right: 1px;
+}
+
+/* Multiplier badge */
+.wl-card-multiplier {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #b8860b;
+    background: rgba(255,255,255,0.9);
+    padding: 2px 5px;
+    border-radius: 4px;
+    border: 1px solid #b8860b;
+}
+
+.wl-card-small .wl-card-multiplier {
+    font-size: 10px;
+    top: 1px;
+    right: 1px;
+    padding: 1px 3px;
+}
+
+/* ============================================================
+   Hand
+   ============================================================ */
+
+#wl-my-hand-wrapper {
+    margin-bottom: 20px;
+}
+
+#wl-my-hand-wrapper h3 {
+    text-align: center;
+    color: #4a7c3f;
+    font-size: 16px;
+    margin: 0 0 8px 0;
+}
+
+#wl-my-hand {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 15px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 10px;
+    min-height: 100px;
+    border: 2px dashed #ccc;
+}
+
+.wl-hand-card {
+    cursor: default;
+    transition: all 0.2s ease;
+}
+
+/* ============================================================
+   Card Interaction States
+   ============================================================ */
+
+.wl-selectable {
+    cursor: pointer !important;
+    box-shadow: 0 0 0 2px #ffcc00, 0 2px 8px rgba(255,204,0,0.4) !important;
+}
+
+.wl-selectable:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 0 0 3px #ffcc00, 0 4px 12px rgba(255,204,0,0.6) !important;
+    z-index: 10;
+}
+
+.wl-dimmed {
+    opacity: 0.4;
+    filter: grayscale(0.5);
+}
+
+.wl-selected {
+    box-shadow: 0 0 0 3px #cc0000, 0 2px 8px rgba(204,0,0,0.4) !important;
+    transform: translateY(-5px);
+}
+
+.wl-target-selectable {
+    cursor: pointer !important;
+    box-shadow: 0 0 0 3px #ff4444 !important;
+    animation: wl-pulse 1s infinite;
+}
+
+/* Highlight specifically for protection choice */
+.wl-protection-choice {
+    box-shadow: 0 0 0 4px #5bb5b5 !important;
+    animation: wl-pulse 1.5s infinite;
+}
+
+@keyframes wl-pulse {
+    0%, 100% { box-shadow: 0 0 0 3px #ff4444; }
+    50% { box-shadow: 0 0 0 5px #ff4444, 0 0 15px rgba(255,68,68,0.3); }
+}
+
+/* ============================================================
+   Player Panel Info
+   ============================================================ */
+
+.wl-panel-info {
+    display: flex;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+.wl-panel-cards {
+    font-weight: bold;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 900px) {
+    #wl-habitats {
+        flex-direction: column;
+    }
+
+    .wl-opponent-habitat {
+        max-width: 100%;
+    }
+
+    .wl-card {
+        width: 100px;
+        height: 75px;
+    }
+
+    #wl-my-hand {
+        gap: 6px;
+    }
+}
