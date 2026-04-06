@@ -188,10 +188,10 @@ class Game extends \Bga\GameFramework\Table
 
         // Enhancers - 4 of each type = 16 total
         $enhancerTypes = [
-            'enhancer_spring' => ['name' => clienttranslate('Primavera'), 'multiplier' => 3, 'target' => 'small_life', 'image' => 'cards/enhancers/Primavera.jpg'],
-            'enhancer_winter' => ['name' => clienttranslate('Invierno'), 'multiplier' => 2, 'target' => 'big_life', 'image' => 'cards/enhancers/Invierno.jpg'],
-            'enhancer_nesting' => ['name' => clienttranslate('Anidación'), 'multiplier' => 2, 'target' => 'flying_life', 'image' => 'cards/enhancers/Anidación.jpg'],
-            'enhancer_spawning' => ['name' => clienttranslate('Desove'), 'multiplier' => 2, 'target' => 'aquatic_life', 'image' => 'cards/enhancers/Desove.jpg'],
+            'enhancer_spring' => ['name' => clienttranslate('Spring'), 'multiplier' => 3, 'target' => 'small_life', 'image' => 'cards/enhancers/Primavera.jpg'],
+            'enhancer_winter' => ['name' => clienttranslate('Winter'), 'multiplier' => 2, 'target' => 'big_life', 'image' => 'cards/enhancers/Invierno.jpg'],
+            'enhancer_nesting' => ['name' => clienttranslate('Nesting'), 'multiplier' => 2, 'target' => 'flying_life', 'image' => 'cards/enhancers/Anidación.jpg'],
+            'enhancer_spawning' => ['name' => clienttranslate('Spawning'), 'multiplier' => 2, 'target' => 'aquatic_life', 'image' => 'cards/enhancers/Desove.jpg'],
         ];
         foreach ($enhancerTypes as $type => $data) {
             for ($i = 1; $i <= 4; $i++) {
@@ -212,7 +212,7 @@ class Game extends \Bga\GameFramework\Table
             self::$CARD_TYPES["rain_{$i}"] = [
                 'card_type' => 'rain',
                 'card_type_arg' => $i,
-                'name' => clienttranslate('Lluvia'),
+                'name' => clienttranslate('Rain'),
                 'category' => 'rain',
                 'points' => 3,
                 'image' => 'cards/enhancers/Lluvia.jpg',
@@ -241,7 +241,7 @@ class Game extends \Bga\GameFramework\Table
             self::$CARD_TYPES["predator_{$arg}"] = [
                 'card_type' => 'predator',
                 'card_type_arg' => $arg,
-                'name' => clienttranslate('Depredador'),
+                'name' => clienttranslate('Predator'),
                 'category' => 'aggressor',
                 'image' => "cards/threats/{$img}.jpg",
             ];
@@ -253,7 +253,7 @@ class Game extends \Bga\GameFramework\Table
             self::$CARD_TYPES["hunter_{$arg}"] = [
                 'card_type' => 'hunter',
                 'card_type_arg' => $arg,
-                'name' => clienttranslate('Cazador'),
+                'name' => clienttranslate('Hunter'),
                 'category' => 'aggressor',
                 'image' => "cards/threats/{$img}.jpg",
             ];
@@ -263,7 +263,7 @@ class Game extends \Bga\GameFramework\Table
         self::$CARD_TYPES['catastrophe_fire_1'] = [
             'card_type' => 'catastrophe_fire',
             'card_type_arg' => 1,
-            'name' => clienttranslate('Incendio'),
+            'name' => clienttranslate('Fire'),
             'category' => 'catastrophe',
             'effect' => 'fire',
             'image' => 'cards/catastrophes/incendio.jpg',
@@ -271,7 +271,7 @@ class Game extends \Bga\GameFramework\Table
         self::$CARD_TYPES['catastrophe_fire_2'] = [
             'card_type' => 'catastrophe_fire',
             'card_type_arg' => 2,
-            'name' => clienttranslate('Incendio'),
+            'name' => clienttranslate('Fire'),
             'category' => 'catastrophe',
             'effect' => 'fire',
             'image' => 'cards/catastrophes/incendio.jpg',
@@ -279,7 +279,7 @@ class Game extends \Bga\GameFramework\Table
         self::$CARD_TYPES['catastrophe_water_1'] = [
             'card_type' => 'catastrophe_water',
             'card_type_arg' => 1,
-            'name' => clienttranslate('Contaminación'),
+            'name' => clienttranslate('Pollution'),
             'category' => 'catastrophe',
             'effect' => 'water',
             'image' => 'cards/catastrophes/contaminación.jpg',
@@ -287,7 +287,7 @@ class Game extends \Bga\GameFramework\Table
         self::$CARD_TYPES['catastrophe_both_1'] = [
             'card_type' => 'catastrophe_both',
             'card_type_arg' => 1,
-            'name' => clienttranslate('Incendio y Contaminación'),
+            'name' => clienttranslate('Fire and Pollution'),
             'category' => 'catastrophe',
             'effect' => 'both',
             'image' => 'cards/catastrophes/Incendio y contaminación.jpg',
@@ -431,8 +431,32 @@ class Game extends \Bga\GameFramework\Table
     {
         $currentCycle = (int)$this->getGameStateValue(self::GV_CURRENT_CYCLE);
         $totalCycles = (int)$this->getGameStateValue(self::GV_TOTAL_CYCLES);
-        if ($totalCycles <= 0) return 0;
-        return min(100, (int)(($currentCycle - 1) * 100 / $totalCycles));
+        $firstPlayerId = (int)$this->getGameStateValue(self::GV_FIRST_PLAYER);
+        
+        $playerIds = $this->getPlayerIds();
+        $playerCount = count($playerIds);
+        
+        if ($totalCycles <= 0 || $playerCount <= 0) return 0;
+
+        // Calculate how many players have already completed their turn in the current cycle
+        // We find the position of the active player relative to the first player of the cycle
+        $activePlayerId = (int)$this->getActivePlayerId();
+        
+        // Find index of first player and active player in the ordered list
+        $firstPlayerIdx = array_search($firstPlayerId, $playerIds);
+        $activePlayerIdx = array_search($activePlayerId, $playerIds);
+        
+        if ($firstPlayerIdx === false || $activePlayerIdx === false) {
+            // Fallback to cycle-only if we can't determine player positions
+            return min(100, (int)(($currentCycle - 1) * 100 / $totalCycles));
+        }
+
+        $playersCompletedInCycle = ($activePlayerIdx - $firstPlayerIdx + $playerCount) % $playerCount;
+        
+        $totalTurns = $totalCycles * $playerCount;
+        $completedTurns = ($currentCycle - 1) * $playerCount + $playersCompletedInCycle;
+        
+        return min(100, (int)($completedTurns * 100 / $totalTurns));
     }
 
     public function upgradeTableDb($from_version)

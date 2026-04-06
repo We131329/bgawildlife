@@ -31,11 +31,20 @@ class EndCycle extends \Bga\GameFramework\States\GameState
             // Add to player's total score
             $this->bga->playerScore->inc($pid, $score);
 
+            // Update stats (Highest Cycle Score)
+            $oldMax = $this->game->bga->playerStats->get('highest_cycle_score', $pid);
+            if ($score > $oldMax) {
+                $this->game->bga->playerStats->set('highest_cycle_score', (int)$score, $pid);
+            }
+
             // Store cycle score for tiebreaker
             \Bga\GameFramework\Table::DbQuery(
                 "INSERT INTO `cycle_score` (`player_id`, `cycle_num`, `score`) VALUES ({$pid}, {$currentCycle}, {$score})"
             );
         }
+
+        // Update table stats
+        $this->game->bga->tableStats->inc('cycles_played', 1);
 
         // Notify scoring
         $this->bga->notify->all("cycleScored", clienttranslate('Cycle ${cycle_num} scoring complete!'), [

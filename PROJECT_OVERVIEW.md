@@ -2,15 +2,6 @@
 
 This project is a BGA implementation of "WildLife". Players compete over a series of "Cycles" to build the highest-scoring habitat.
 
-## Core Mechanics
-- **Habitat Building**: Players play Life cards (Small, Big, Flying, Aquatic) to their personal habitat.
-- **Enhancement**: Enhancer cards (Spring, Winter, Nesting, Spawning) provide multipliers for specific life types.
-- **Interaction**:
-    - **Predators**: Remove a single card from an opponent.
-    - **Hunters**: Target an entire category of life. Triggers a reaction if the target has a **Protector**.
-    - **Catastrophes**: Global events (Fire, Water) that affect all players simultaneously.
-- **Scoring**: Occurs at the end of each cycle. Most points are cumulative, but **Rain** provides temporary points that disappear after scoring.
-
 ## Technical Architecture
 - **Framework**: Modern BGA PHP framework using namespaces and State-pattern classes.
 - **State Machine**:
@@ -22,31 +13,31 @@ This project is a BGA implementation of "WildLife". Players compete over a serie
     - `EndCycle`: Calculates habitat scores and manages temporary card removal.
     - `EndScore`: Final tiebreaker logic using encoded cycle history.
 
-## Completed Improvements
+## Wrap Up & Polish Roadmap
 
-### 1. Centralize Data Mappings (Completed)
-Mappings between Life Type integers and strings are centralized in `Game.php` using `LIFE_TYPE_TO_ID` and `ID_TO_LIFE_TYPE` constants.
+### 1. Game Progression
+- **Status**: Basic `getGameProgression()` exists in `Game.php`.
+- **Goal**: Refine it to calculate progress based on the current cycle vs. total cycles (e.g., `($currentCycle - 1) / $totalCycles * 100`).
 
-### 2. Standardize State Transitions (Completed)
-State transitions use class-based references or constants consistently.
+### 2. Comprehensive Zombie Mode
+- **Status**: Implemented for `MulliganPhase` and `PlayerTurn`.
+- **Goal**: Audit and add `zombie()` methods to all other state classes (`DrawPhase`, `ReactProtector`, etc.) to ensure the game never hangs if a player disconnects.
 
-### 3. Tiebreaker Integer Safety (Verified)
-The tiebreaker uses a base-128 encoding to fit safely within a 32-bit signed integer.
+### 3. Statistics (stats.json)
+- **Status**: `stats.json` is well-defined with categories like `life_cards_played`, `hunters_played`, and `highest_cycle_score`.
+- **Goal**: Ensure all PHP actions (in `PlayerTurn`, `ReactProtector`, etc.) actually call `$this->game->playerStats->inc(...)` to update these values during play.
 
-### 4. Code Reuse in Aggression Logic (Completed)
-Centralized logic for card removal in `discardLifeAndEnhancers()`.
+### 4. Game Logs & Notifications
+- **Status**: Major actions have logs.
+- **Goal**: Review all notifications to ensure the text (e.g., `${player_name} plays ${card_name}`) provides a clear history of the game in the log panel.
 
-### 5. Translation Consistency (Completed)
-All user-facing strings are wrapped in `clienttranslate()`.
+### 5. Tiebreaking
+- **Status**: **Completed**. `EndScore.php` implements a base-128 tiebreaker, and `gameinfos.inc.php` correctly describes it as "Highest score in a single cycle".
 
-### 6. Validation Logic (Completed)
-Playability rules are centralized in the `RulesEngine` class.
+### 6. Translation Audit
+- **Status**: Most strings are wrapped.
+- **Goal**: Final pass to ensure no hardcoded English/Spanish strings remain in JS or PHP.
 
-### 7. Global Values (Verified)
-`GV_ACTIVE_TURN_PLAYER` tracks the primary active player during multi-action turns.
-
-### 8. Mulligan Feature (New)
-At the start of the game:
-- **First Player**: Can choose 1-6 cards to discard and replace.
-- **Other Players**: Can choose to replace their entire 6-card hand or keep it.
-- **Simultaneous**: All players decide at once to keep the game fast.
+### 7. UI Tooltips
+- **Status**: Cards are rendered but lack interactive tooltips.
+- **Goal**: Use `this.bga.tooltips.addTooltipHtml()` in `Game.js` to show card descriptions or effects when hovering over images.

@@ -77,6 +77,9 @@ class PlayerTurn extends GameState
         // Move card to habitat
         $this->game->cards->moveCard($card_id, 'habitat', $activePlayerId);
 
+        // Update stats
+        $this->game->bga->playerStats->inc('life_cards_played', 1, $activePlayerId);
+
         $info = Game::getCardTypeInfo($card['type'], (int)$card['type_arg']);
         $this->bga->notify->all("cardPlayedToHabitat", clienttranslate('${player_name} plays ${card_name} to their habitat'), [
             'player_id' => $activePlayerId,
@@ -89,14 +92,13 @@ class PlayerTurn extends GameState
         // Check if removal orphaned an enhancer
         $orphaned = $this->cleanupOrphanedEnhancers($activePlayerId);
         if (!empty($orphaned)) {
-            $this->bga->notify->all("hunterResolved", clienttranslate('${target_name} loses an Enhancer because no animals of that type remain!'), [
+            $this->bga->notify->all("enhancerLost", clienttranslate('${target_name} loses an Enhancer because no animals of that type remain!'), [
                 'target_id' => $activePlayerId,
                 'target_name' => $this->game->getPlayerNameById($activePlayerId),
                 'removed_cards' => $orphaned,
                 'nbr' => count($orphaned),
             ]);
         }
-
         return $this->afterCardPlayed($activePlayerId);
     }
 
@@ -118,6 +120,9 @@ class PlayerTurn extends GameState
         \Bga\Games\WildLife\RulesEngine::validatePlay($this->game, $activePlayerId, $card);
 
         $this->game->cards->moveCard($card_id, 'habitat', $activePlayerId);
+
+        // Update stats
+        $this->game->bga->playerStats->inc('enhancers_played', 1, $activePlayerId);
 
         $info = Game::getCardTypeInfo($card['type'], (int)$card['type_arg']);
         $this->bga->notify->all("cardPlayedToHabitat", clienttranslate('${player_name} plays ${card_name} enhancer'), [
@@ -149,7 +154,7 @@ class PlayerTurn extends GameState
         $this->bga->notify->all("cardPlayedToHabitat", clienttranslate('${player_name} plays Rain (3 points this cycle)'), [
             'player_id' => $activePlayerId,
             'player_name' => $this->game->getPlayerNameById($activePlayerId),
-            'card_name' => _('Rain'),
+            'card_name' => clienttranslate('Rain'),
             'card' => $card,
             'card_id' => $card_id,
         ]);
@@ -182,17 +187,19 @@ class PlayerTurn extends GameState
         // Discard the predator card
         $this->game->cards->moveCard($card_id, 'discard');
 
+        // Update stats
+        $this->game->bga->playerStats->inc('predators_played', 1, $activePlayerId);
+
         // Check if removal orphaned an enhancer for the target player
         $orphaned = $this->cleanupOrphanedEnhancers($target_player_id);
         if (!empty($orphaned)) {
-            $this->bga->notify->all("hunterResolved", clienttranslate('${target_name} loses an Enhancer because no animals of that type remain!'), [
-                'target_id' => $target_player_id,
-                'target_name' => $this->game->getPlayerNameById($target_player_id),
+            $this->bga->notify->all("enhancerLost", clienttranslate('${target_name} loses an Enhancer because no animals of that type remain!'), [
+                'target_id' => $activePlayerId,
+                'target_name' => $this->game->getPlayerNameById($activePlayerId),
                 'removed_cards' => $orphaned,
                 'nbr' => count($orphaned),
             ]);
         }
-
         $removedInfo = Game::getCardTypeInfo($removedCard['type'], (int)$removedCard['type_arg']);
         $this->bga->notify->all("predatorPlayed", clienttranslate('${player_name} plays a Predator! ${target_name} loses ${card_name}'), [
             'player_id' => $activePlayerId,
@@ -236,6 +243,9 @@ class PlayerTurn extends GameState
         // Discard the hunter card
         $this->game->cards->moveCard($card_id, 'discard');
 
+        // Update stats
+        $this->game->bga->playerStats->inc('hunters_played', 1, $activePlayerId);
+
         // Increment cards played
         $played = (int)$this->game->getGameStateValue(Game::GV_CARDS_PLAYED_THIS_CYCLE) + 1;
         $this->game->setGameStateValue(Game::GV_CARDS_PLAYED_THIS_CYCLE, $played);
@@ -278,6 +288,9 @@ class PlayerTurn extends GameState
 
         // Discard the catastrophe card
         $this->game->cards->moveCard($card_id, 'discard');
+
+        // Update stats
+        $this->game->bga->playerStats->inc('catastrophes_played', 1, $activePlayerId);
 
         $info = Game::getCardTypeInfo($card['type'], (int)$card['type_arg']);
         $this->bga->notify->all("catastrophePlayed", clienttranslate('${player_name} plays ${card_name}! ${nbr} card(s) removed from all habitats!'), [

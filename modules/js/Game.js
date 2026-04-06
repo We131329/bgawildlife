@@ -263,11 +263,11 @@ export class Game {
                             <span class="wl-habitat-score" id="wl-habitat-score-${player.id}">0 pts</span>
                         </div>
                         <div class="wl-habitat-grid" id="wl-habitat-grid-${player.id}">
-                            <div class="wl-habitat-column wl-habitat-extras" id="wl-hab-${player.id}-extras"><div class="wl-col-label">🌧️ Rain</div></div>
-                            <div class="wl-habitat-column" data-type="small_life" id="wl-hab-${player.id}-small_life"><div class="wl-col-label">🐿️ Small</div></div>
-                            <div class="wl-habitat-column" data-type="big_life" id="wl-hab-${player.id}-big_life"><div class="wl-col-label">🦌 Big</div></div>
-                            <div class="wl-habitat-column" data-type="flying_life" id="wl-hab-${player.id}-flying_life"><div class="wl-col-label">🐦 Flying</div></div>
-                            <div class="wl-habitat-column" data-type="aquatic_life" id="wl-hab-${player.id}-aquatic_life"><div class="wl-col-label">🐟 Aquatic</div></div>
+                            <div class="wl-habitat-column wl-habitat-extras" id="wl-hab-${player.id}-extras"><div class="wl-col-label">🌧️ ${_('Rain')}</div></div>
+                            <div class="wl-habitat-column" data-type="small_life" id="wl-hab-${player.id}-small_life"><div class="wl-col-label">🐿️ ${_('Small')}</div></div>
+                            <div class="wl-habitat-column" data-type="big_life" id="wl-hab-${player.id}-big_life"><div class="wl-col-label">🦌 ${_('Big')}</div></div>
+                            <div class="wl-habitat-column" data-type="flying_life" id="wl-hab-${player.id}-flying_life"><div class="wl-col-label">🐦 ${_('Flying')}</div></div>
+                            <div class="wl-habitat-column" data-type="aquatic_life" id="wl-hab-${player.id}-aquatic_life"><div class="wl-col-label">🐟 ${_('Aquatic')}</div></div>
                         </div>
                     </div>
                 `);
@@ -278,11 +278,11 @@ export class Game {
         const myHab = document.getElementById('wl-my-habitat');
         myHab.innerHTML = `
             <div class="wl-habitat-grid wl-my-grid">
-                <div class="wl-habitat-column wl-my-col wl-habitat-extras" id="wl-my-hab-extras"><div class="wl-col-label">🌧️ Rain</div></div>
-                <div class="wl-habitat-column wl-my-col" data-type="small_life" id="wl-my-hab-small_life"><div class="wl-col-label">🐿️ Small Life</div></div>
-                <div class="wl-habitat-column wl-my-col" data-type="big_life" id="wl-my-hab-big_life"><div class="wl-col-label">🦌 Big Life</div></div>
-                <div class="wl-habitat-column wl-my-col" data-type="flying_life" id="wl-my-hab-flying_life"><div class="wl-col-label">🐦 Flying Life</div></div>
-                <div class="wl-habitat-column wl-my-col" data-type="aquatic_life" id="wl-my-hab-aquatic_life"><div class="wl-col-label">🐟 Aquatic Life</div></div>
+                <div class="wl-habitat-column wl-my-col wl-habitat-extras" id="wl-my-hab-extras"><div class="wl-col-label">🌧️ ${_('Rain')}</div></div>
+                <div class="wl-habitat-column wl-my-col" data-type="small_life" id="wl-my-hab-small_life"><div class="wl-col-label">🐿️ ${_('Small Life')}</div></div>
+                <div class="wl-habitat-column wl-my-col" data-type="big_life" id="wl-my-hab-big_life"><div class="wl-col-label">🦌 ${_('Big Life')}</div></div>
+                <div class="wl-habitat-column wl-my-col" data-type="flying_life" id="wl-my-hab-flying_life"><div class="wl-col-label">🐦 ${_('Flying Life')}</div></div>
+                <div class="wl-habitat-column wl-my-col" data-type="aquatic_life" id="wl-my-hab-aquatic_life"><div class="wl-col-label">🐟 ${_('Aquatic Life')}</div></div>
             </div>
         `;
 
@@ -348,7 +348,60 @@ export class Game {
             div.innerHTML += `<div class="wl-card-points">🐾🐾🐾</div>`;
         }
 
+        // Add tooltip
+        this.addTooltipToCard(div, card, info, category);
+
         return div;
+    }
+
+    addTooltipToCard(element, card, info, category) {
+        let title = info ? info.name : card.type;
+        let description = '';
+
+        switch (category) {
+            case 'life':
+                const lifeType = LIFE_TYPE_LABELS[card.type] || card.type;
+                if (card.type === 'aquatic_life') {
+                    description = _('Aquatic animal. Scoring: 1:1pt, 2:3pts, 3:6pts, 4:10pts, 5+:15pts.');
+                } else {
+                    description = _('${life_type} animal. Worth ${n} point(s).').replace('${life_type}', lifeType).replace('${n}', info.points || 0);
+                }
+                break;
+            case 'enhancer':
+                const target = LIFE_TYPE_LABELS[info.target_life] || info.target_life;
+                description = _('Multiplies the score of your ${target} animals by ${n}.').replace('${target}', target).replace('${n}', info.multiplier);
+                break;
+            case 'rain':
+                description = _('Temporary card. Worth 3 points at the end of this cycle only.');
+                break;
+            case 'protector':
+                description = _('Protects your habitat. Can be played when an opponent uses a Hunter against you.');
+                break;
+            case 'aggressor':
+                if (card.type === 'predator') {
+                    description = _('Aggressor. Discard one life card from an opponent\'s habitat.');
+                } else {
+                    description = _('Aggressor. Discard ALL cards of a specific life type from an opponent\'s habitat.');
+                }
+                break;
+            case 'catastrophe':
+                if (card.type === 'catastrophe_fire') {
+                    description = _('Catastrophe. Removes all Small, Big, and Flying animals from ALL habitats.');
+                } else if (card.type === 'catastrophe_water') {
+                    description = _('Catastrophe. Removes all Aquatic animals from ALL habitats.');
+                } else {
+                    description = _('Catastrophe. Removes ALL animals from ALL habitats.');
+                }
+                break;
+        }
+
+        this.bga.gameui.addTooltipHtml(element.id, `
+            <div class="wl-tooltip">
+                <strong>${title}</strong><br/>
+                <small>${category.toUpperCase()}</small><hr/>
+                <div>${description}</div>
+            </div>
+        `);
     }
 
     placeCardInHabitat(card, playerId) {

@@ -60,6 +60,9 @@ class ReactProtector extends GameState
         // Discard the protector
         $this->game->cards->moveCard($card_id, 'discard');
 
+        // Update stats
+        $this->game->bga->playerStats->inc('protectors_used', 1, $activePlayerId);
+
         $lifeTypeInt = (int)$this->game->getGameStateValue(Game::GV_PENDING_HUNTER_LIFETYPE);
         $lifeType = Game::ID_TO_LIFE_TYPE[$lifeTypeInt] ?? 'unknown';
 
@@ -92,13 +95,40 @@ class ReactProtector extends GameState
         // Execute hunter effect
         $removedCards = $this->game->executeHunter($targetPlayerId, $lifeType);
 
-        $this->bga->notify->all("hunterResolved", clienttranslate('${target_name} does not protect. ${nbr} card(s) removed!'), [
+        $this->bga->notify->all("hunterResolved", clienttranslate('The Hunter removes ${nbr} ${life_type} card(s) from ${target_name}!'), [
             'target_id' => $targetPlayerId,
             'target_name' => $this->game->getPlayerNameById($targetPlayerId),
             'removed_cards' => $removedCards,
             'nbr' => count($removedCards),
             'life_type' => $lifeType,
         ]);
+
+        // Check if removal orphaned an enhancer
+        $habitat = $this->game->cards->getCardsInLocation('habitat', $targetPlayerId);
+        $lifeTypesRemaining = [];
+        $enhancers = [];
+        foreach ($habitat as $card) {
+            if (Game::isLifeType($card['type'])) $lifeTypesRemaining[$card['type']] = true;
+            if (str_starts_with($card['type'], 'enhancer_')) $enhancers[] = $card;
+        }
+
+        $orphaned = [];
+        foreach ($enhancers as $enhancer) {
+            $target = Game::ENHANCER_TARGETS[$enhancer['type']] ?? null;
+            if ($target && !isset($lifeTypesRemaining[$target])) {
+                $this->game->cards->moveCard((int)$enhancer['id'], 'discard');
+                $orphaned[] = $enhancer;
+            }
+        }
+
+        if (!empty($orphaned)) {
+            $this->bga->notify->all("enhancerLost", clienttranslate('${target_name} loses an Enhancer because no animals of that type remain!'), [
+                'target_id' => $targetPlayerId,
+                'target_name' => $this->game->getPlayerNameById($targetPlayerId),
+                'removed_cards' => $orphaned,
+                'nbr' => count($orphaned),
+            ]);
+        }
 
         // Clear pending hunter
         $this->game->setGameStateValue(Game::GV_PENDING_HUNTER_PLAYER, 0);
