@@ -93,7 +93,7 @@ class MulliganPhase {
     onMulliganClick(isFirstPlayer) {
         if (!isFirstPlayer) {
             // Select all cards automatically for non-first player
-            const allIds = Array.from(document.querySelectorAll('.wl-hand-card')).map(el => parseInt(el.dataset.cardId));
+            const allIds = Array.from(document.querySelectorAll('.wld_hand-card')).map(el => parseInt(el.dataset.cardId));
             this.bga.actions.performAction("actMulligan", { cardIds: allIds });
             return;
         }
@@ -227,20 +227,20 @@ export class Game {
 
         // Create main game layout
         this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', `
-            <div id="wl-game-info">
-                <span id="wl-cycle-info">Cycle <span id="wl-current-cycle">${gamedatas.currentCycle}</span> / <span id="wl-total-cycles">${gamedatas.totalCycles}</span></span>
-                <span id="wl-deck-info">Deck: <span id="wl-deck-count">${gamedatas.deckCount}</span></span>
-                <span id="wl-discard-info">Discard: <span id="wl-discard-count">${gamedatas.discardCount}</span></span>
+            <div id="wld_game-info">
+                <span id="wld_cycle-info">${_('Cycle')} <span id="wld_current-cycle">${gamedatas.currentCycle}</span> / <span id="wld_total-cycles">${gamedatas.totalCycles}</span></span>
+                <span id="wld_deck-info">${_('Deck:')} <span id="wld_deck-count">${gamedatas.deckCount}</span></span>
+                <span id="wld_discard-info">${_('Discard:')} <span id="wld_discard-count">${gamedatas.discardCount}</span></span>
             </div>
-            <div id="wl-my-hand-wrapper">
-                <h3>My Hand</h3>
-                <div id="wl-my-hand"></div>
+            <div id="wld_my-hand-wrapper">
+                <h3>${_('My Hand')}</h3>
+                <div id="wld_my-hand"></div>
             </div>
-            <div id="wl-my-habitat-wrapper">
-                <h3 id="wl-my-habitat-title">My Habitat</h3>
-                <div id="wl-my-habitat"></div>
+            <div id="wld_my-habitat-wrapper">
+                <h3 id="wld_my-habitat-title">${_('My Habitat')}</h3>
+                <div id="wld_my-habitat"></div>
             </div>
-            <div id="wl-habitats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"></div>
+            <div id="wld_habitats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"></div>
         `);
 
         // Setup player panels and habitats
@@ -249,25 +249,27 @@ export class Game {
         Object.values(gamedatas.players).forEach(player => {
             // Player panel with score
             this.bga.playerPanels.getElement(player.id).insertAdjacentHTML('beforeend', `
-                <div class="wl-panel-info">
-                    <span class="wl-panel-cards">🃏 <span id="wl-hand-count-${player.id}">${gamedatas.handCounts[player.id] || 0}</span></span>
+                <div class="wld_panel-info">
+                    <span class="wld_panel-cards">🃏 <span id="wld_hand-count-${player.id}">${gamedatas.handCounts[player.id] || 0}</span></span>
                 </div>
             `);
 
             // Opponent habitat zones
             if (parseInt(player.id) !== currentPlayerId) {
-                document.getElementById('wl-habitats').insertAdjacentHTML('beforeend', `
-                    <div class="wl-opponent-habitat" id="wl-habitat-${player.id}">
-                        <div class="wl-habitat-header" style="border-color: #${player.color}">
+                const tokenImg = this.bga.images.getImgUrl('cards/special/firstToken.jpg');
+                document.getElementById('wld_habitats').insertAdjacentHTML('beforeend', `
+                    <div class="wld_opponent-habitat" id="wld_habitat-${player.id}">
+                        <div class="wld_habitat-header" style="border-color: #${player.color}">
                             <strong>${player.name}</strong>
-                            <span class="wl-habitat-score" id="wl-habitat-score-${player.id}">0 pts</span>
+                            <span class="wld_habitat-score" id="wld_habitat-score-${player.id}">0 ${_('pts')}</span>
+                            <div class="wld_first-player-token" id="wld_token_${player.id}" style="background-image: url('${tokenImg}')"></div>
                         </div>
-                        <div class="wl-habitat-grid" id="wl-habitat-grid-${player.id}">
-                            <div class="wl-habitat-column wl-habitat-extras" id="wl-hab-${player.id}-extras"><div class="wl-col-label">🌧️ ${_('Rain')}</div></div>
-                            <div class="wl-habitat-column" data-type="small_life" id="wl-hab-${player.id}-small_life"><div class="wl-col-label">🐿️ ${_('Small')}</div></div>
-                            <div class="wl-habitat-column" data-type="big_life" id="wl-hab-${player.id}-big_life"><div class="wl-col-label">🦌 ${_('Big')}</div></div>
-                            <div class="wl-habitat-column" data-type="flying_life" id="wl-hab-${player.id}-flying_life"><div class="wl-col-label">🐦 ${_('Flying')}</div></div>
-                            <div class="wl-habitat-column" data-type="aquatic_life" id="wl-hab-${player.id}-aquatic_life"><div class="wl-col-label">🐟 ${_('Aquatic')}</div></div>
+                        <div class="wld_habitat-grid" id="wld_habitat-grid-${player.id}">
+                            <div class="wld_habitat-column wld_habitat-extras" id="wld_hab-${player.id}-extras"><div class="wld_col-label">🌧️ ${_('Rain')}</div></div>
+                            <div class="wld_habitat-column" data-type="small_life" id="wld_hab-${player.id}-small_life"><div class="wld_col-label">🐿️ ${_('Small')}</div></div>
+                            <div class="wld_habitat-column" data-type="big_life" id="wld_hab-${player.id}-big_life"><div class="wld_col-label">🦌 ${_('Big')}</div></div>
+                            <div class="wld_habitat-column" data-type="flying_life" id="wld_hab-${player.id}-flying_life"><div class="wld_col-label">🐦 ${_('Flying')}</div></div>
+                            <div class="wld_habitat-column" data-type="aquatic_life" id="wld_hab-${player.id}-aquatic_life"><div class="wld_col-label">🐟 ${_('Aquatic')}</div></div>
                         </div>
                     </div>
                 `);
@@ -275,16 +277,23 @@ export class Game {
         });
 
         // My habitat
-        const myHab = document.getElementById('wl-my-habitat');
+        const myHab = document.getElementById('wld_my-habitat');
+        const myTokenImg = this.bga.images.getImgUrl('cards/special/firstToken.jpg');
         myHab.innerHTML = `
-            <div class="wl-habitat-grid wl-my-grid">
-                <div class="wl-habitat-column wl-my-col wl-habitat-extras" id="wl-my-hab-extras"><div class="wl-col-label">🌧️ ${_('Rain')}</div></div>
-                <div class="wl-habitat-column wl-my-col" data-type="small_life" id="wl-my-hab-small_life"><div class="wl-col-label">🐿️ ${_('Small Life')}</div></div>
-                <div class="wl-habitat-column wl-my-col" data-type="big_life" id="wl-my-hab-big_life"><div class="wl-col-label">🦌 ${_('Big Life')}</div></div>
-                <div class="wl-habitat-column wl-my-col" data-type="flying_life" id="wl-my-hab-flying_life"><div class="wl-col-label">🐦 ${_('Flying Life')}</div></div>
-                <div class="wl-habitat-column wl-my-col" data-type="aquatic_life" id="wl-my-hab-aquatic_life"><div class="wl-col-label">🐟 ${_('Aquatic Life')}</div></div>
+            <div class="wld_habitat-header" style="border-bottom:none; padding:0; margin-bottom:10px;">
+                <div class="wld_first-player-token" id="wld_token_${currentPlayerId}" style="background-image: url('${myTokenImg}')"></div>
+            </div>
+            <div class="wld_habitat-grid wld_my-grid">
+                <div class="wld_habitat-column wld_my-col wld_habitat-extras" id="wld_my-hab-extras"><div class="wld_col-label">🌧️ ${_('Rain')}</div></div>
+                <div class="wld_habitat-column wld_my-col" data-type="small_life" id="wld_my-hab-small_life"><div class="wld_col-label">🐿️ ${_('Small Life')}</div></div>
+                <div class="wld_habitat-column wld_my-col" data-type="big_life" id="wld_my-hab-big_life"><div class="wld_col-label">🦌 ${_('Big Life')}</div></div>
+                <div class="wld_habitat-column wld_my-col" data-type="flying_life" id="wld_my-hab-flying_life"><div class="wld_col-label">🐦 ${_('Flying Life')}</div></div>
+                <div class="wld_habitat-column wld_my-col" data-type="aquatic_life" id="wld_my-hab-aquatic_life"><div class="wld_col-label">🐟 ${_('Aquatic Life')}</div></div>
             </div>
         `;
+
+        // Initial token state
+        this.updateFirstPlayerToken(gamedatas.firstPlayer);
 
         // Render existing habitat cards
         Object.entries(gamedatas.habitats).forEach(([pid, cards]) => {
@@ -306,7 +315,7 @@ export class Game {
         const info = getCardTypeInfo(this.cardTypes, card);
         const category = getCardCategory(card.type);
         const borderColor = CATEGORY_COLORS[category] || '#999';
-        const sizeClass = size === 'small' ? 'wl-card-small' : 'wl-card';
+        const sizeClass = size === 'small' ? 'wld_card-small' : 'wld_card';
 
         const name = info ? info.name : card.type;
         let image = info ? info.image : '';
@@ -317,8 +326,8 @@ export class Game {
         }
 
         const div = document.createElement('div');
-        div.className = `${sizeClass} wl-card-${category}`;
-        div.id = `wl-card-${card.id}`;
+        div.className = `${sizeClass} wld_card-${category}`;
+        div.id = `wld_card-${card.id}`;
         div.dataset.cardId = card.id;
         div.dataset.cardType = card.type;
         div.dataset.cardTypeArg = card.type_arg;
@@ -326,26 +335,26 @@ export class Game {
 
         if (image) {
             const imgUrl = this.bga.images.getImgUrl(image);
-            div.innerHTML = `<img class="wl-card-img" src="${imgUrl}" alt="${name}" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" /><div class="wl-card-fallback" style="display:none">${name}</div>`;
+            div.innerHTML = `<img class="wld_card-img" src="${imgUrl}" alt="${name}" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" /><div class="wld_card-fallback" style="display:none">${name}</div>`;
         } else {
-            div.innerHTML = `<div class="wl-card-fallback">${name}</div>`;
+            div.innerHTML = `<div class="wld_card-fallback">${name}</div>`;
         }
 
         // Add point indicator for life cards
         if (category === 'life' && info) {
             const pts = info.points || '?';
             const icon = LIFE_TYPE_ICONS[card.type] || '';
-            div.innerHTML += `<div class="wl-card-points">${icon} ${pts === 0 ? '📊' : '🐾'.repeat(pts)}</div>`;
+            div.innerHTML += `<div class="wld_card-points">${icon} ${pts === 0 ? '📊' : '🐾'.repeat(pts)}</div>`;
         }
 
         // Add multiplier for enhancers
         if (category === 'enhancer' && info) {
-            div.innerHTML += `<div class="wl-card-multiplier">${info.multiplier}x</div>`;
+            div.innerHTML += `<div class="wld_card-multiplier">${info.multiplier}x</div>`;
         }
 
         // Rain indicator
         if (card.type === 'rain') {
-            div.innerHTML += `<div class="wl-card-points">🐾🐾🐾</div>`;
+            div.innerHTML += `<div class="wld_card-points">🐾🐾🐾</div>`;
         }
 
         // Add tooltip
@@ -396,7 +405,7 @@ export class Game {
         }
 
         this.bga.gameui.addTooltipHtml(element.id, `
-            <div class="wl-tooltip">
+            <div class="wld_tooltip">
                 <strong>${title}</strong><br/>
                 <small>${category.toUpperCase()}</small><hr/>
                 <div>${description}</div>
@@ -407,7 +416,7 @@ export class Game {
     placeCardInHabitat(card, playerId) {
         const currentPlayerId = this.bga.players.getCurrentPlayerId();
         const isMe = playerId === currentPlayerId;
-        const prefix = isMe ? 'wl-my-hab' : `wl-hab-${playerId}`;
+        const prefix = isMe ? 'wld_my-hab' : `wld_hab-${playerId}`;
         const size = isMe ? 'normal' : 'small';
 
         const category = getCardCategory(card.type);
@@ -435,30 +444,43 @@ export class Game {
     }
 
     removeCardFromHabitat(cardId) {
-        const el = document.getElementById(`wl-card-${cardId}`);
+        const el = document.getElementById(`wld_card-${cardId}`);
         if (el) el.remove();
     }
 
     renderHand(cards) {
-        const handEl = document.getElementById('wl-my-hand');
+        const handEl = document.getElementById('wld_my-hand');
         handEl.innerHTML = '';
         cards.forEach(card => {
             const cardEl = this.createCardElement(card, 'normal');
-            cardEl.classList.add('wl-hand-card');
+            cardEl.classList.add('wld_hand-card');
             handEl.appendChild(cardEl);
         });
     }
 
     addCardToHand(card) {
-        const handEl = document.getElementById('wl-my-hand');
+        const handEl = document.getElementById('wld_my-hand');
         const cardEl = this.createCardElement(card, 'normal');
-        cardEl.classList.add('wl-hand-card');
+        cardEl.classList.add('wld_hand-card');
         handEl.appendChild(cardEl);
     }
 
     removeCardFromHand(cardId) {
-        const el = document.getElementById(`wl-card-${cardId}`);
+        const el = document.getElementById(`wld_card-${cardId}`);
         if (el) el.remove();
+    }
+
+    updateFirstPlayerToken(firstPlayerId) {
+        // Hide all tokens
+        document.querySelectorAll('.wld_first-player-token').forEach(el => {
+            el.classList.remove('wld_visible');
+        });
+
+        // Show only the one for the first player
+        const activeToken = document.getElementById(`wld_token_${firstPlayerId}`);
+        if (activeToken) {
+            activeToken.classList.add('wld_visible');
+        }
     }
 
     // ============================================================
@@ -467,9 +489,9 @@ export class Game {
 
     enableMulliganSelection(maxCards) {
         this.selectedCards.clear();
-        document.querySelectorAll('.wl-hand-card').forEach(el => {
-            el.classList.add('wl-selectable');
-            el.classList.remove('wl-dimmed', 'wl-selected');
+        document.querySelectorAll('.wld_hand-card').forEach(el => {
+            el.classList.add('wld_selectable');
+            el.classList.remove('wld_dimmed', 'wld_selected');
             el.onclick = () => this.onMulliganCardClick(parseInt(el.dataset.cardId), el, maxCards);
         });
     }
@@ -477,11 +499,11 @@ export class Game {
     onMulliganCardClick(cardId, el, maxCards) {
         if (this.selectedCards.has(cardId)) {
             this.selectedCards.delete(cardId);
-            el.classList.remove('wl-selected');
+            el.classList.remove('wld_selected');
         } else {
             if (this.selectedCards.size < maxCards) {
                 this.selectedCards.add(cardId);
-                el.classList.add('wl-selected');
+                el.classList.add('wld_selected');
             }
         }
     }
@@ -494,15 +516,15 @@ export class Game {
         // Set the base title for the turn
         this.updateTurnTitle();
 
-        document.querySelectorAll('.wl-hand-card').forEach(el => {
+        document.querySelectorAll('.wld_hand-card').forEach(el => {
             const cardId = parseInt(el.dataset.cardId);
             if (playableIds.includes(cardId)) {
-                el.classList.add('wl-selectable');
+                el.classList.add('wld_selectable');
                 el.onclick = () => this.onHandCardClick(cardId, el);
-                el.classList.remove('wl-dimmed');
+                el.classList.remove('wld_dimmed');
             } else {
-                el.classList.add('wl-dimmed');
-                el.classList.remove('wl-selectable');
+                el.classList.add('wld_dimmed');
+                el.classList.remove('wld_selectable');
                 el.onclick = null;
             }
         });
@@ -533,12 +555,12 @@ export class Game {
 
         this.updateTurnTitle();
 
-        const handCount = document.querySelectorAll('.wl-hand-card').length;
+        const handCount = document.querySelectorAll('.wld_hand-card').length;
         this.discardTarget = handCount - 3;
 
-        document.querySelectorAll('.wl-hand-card').forEach(el => {
-            el.classList.add('wl-selectable');
-            el.classList.remove('wl-dimmed');
+        document.querySelectorAll('.wld_hand-card').forEach(el => {
+            el.classList.add('wld_selectable');
+            el.classList.remove('wld_dimmed');
             el.onclick = () => this.onDiscardCardClick(parseInt(el.dataset.cardId), el);
         });
 
@@ -546,8 +568,8 @@ export class Game {
     }
 
     disableCardSelection() {
-        document.querySelectorAll('.wl-hand-card').forEach(el => {
-            el.classList.remove('wl-selectable', 'wl-dimmed', 'wl-selected', 'wl-target-selectable');
+        document.querySelectorAll('.wld_hand-card').forEach(el => {
+            el.classList.remove('wld_selectable', 'wld_dimmed', 'wld_selected', 'wld_target-selectable');
             el.onclick = null;
         });
         this.selectedCards.clear();
@@ -573,9 +595,9 @@ export class Game {
             this.selectedCards.clear();
             this.bga.statusBar.removeActionButtons();
             this.bga.statusBar.setTitle(_('Select up to ${n} card(s) to discard').replace('${n}', this.currentArgs.cardsRemaining));
-            document.querySelectorAll('.wl-hand-card').forEach(el => {
-                el.classList.remove('wl-dimmed');
-                el.classList.add('wl-selectable');
+            document.querySelectorAll('.wld_hand-card').forEach(el => {
+                el.classList.remove('wld_dimmed');
+                el.classList.add('wld_selectable');
                 el.onclick = () => this.onDiscardCardClick(parseInt(el.dataset.cardId), el);
             });
             this.bga.statusBar.addActionButton(_('Cancel Discard'), () => this.toggleDiscardMode(), { color: 'secondary' });
@@ -617,11 +639,11 @@ export class Game {
 
         if (this.selectedCards.has(cardId)) {
             this.selectedCards.delete(cardId);
-            el.classList.remove('wl-selected');
+            el.classList.remove('wld_selected');
         } else {
             if (this.selectedCards.size < maxDiscards) {
                 this.selectedCards.add(cardId);
-                el.classList.add('wl-selected');
+                el.classList.add('wld_selected');
             }
         }
 
@@ -703,13 +725,13 @@ export class Game {
 
         // Highlight clickable cards in opponent's habitat
         targetPlayer.habitatCards.forEach(hCard => {
-            const el = document.getElementById(`wl-card-${hCard.id}`);
+            const el = document.getElementById(`wld_card-${hCard.id}`);
             if (el) {
-                el.classList.add('wl-target-selectable');
+                el.classList.add('wld_target-selectable');
                 el.onclick = () => {
                     // Remove highlights
-                    document.querySelectorAll('.wl-target-selectable').forEach(e => {
-                        e.classList.remove('wl-target-selectable');
+                    document.querySelectorAll('.wld_target-selectable').forEach(e => {
+                        e.classList.remove('wld_target-selectable');
                         e.onclick = null;
                     });
                     this.bga.actions.performAction("actPlayPredator", {
@@ -722,8 +744,8 @@ export class Game {
         });
 
         this.bga.statusBar.addActionButton(_('Cancel'), () => {
-            document.querySelectorAll('.wl-target-selectable').forEach(e => {
-                e.classList.remove('wl-target-selectable');
+            document.querySelectorAll('.wld_target-selectable').forEach(e => {
+                e.classList.remove('wld_target-selectable');
                 e.onclick = null;
             });
             const args = this.currentArgs;
@@ -766,7 +788,7 @@ export class Game {
 
     findCardInHand(cardId) {
         return (this.gamedatas.hand || []).find(c => parseInt(c.id) === cardId) ||
-               { id: cardId, type: document.getElementById(`wl-card-${cardId}`)?.dataset.cardType, type_arg: document.getElementById(`wl-card-${cardId}`)?.dataset.cardTypeArg };
+               { id: cardId, type: document.getElementById(`wld_card-${cardId}`)?.dataset.cardType, type_arg: document.getElementById(`wld_card-${cardId}`)?.dataset.cardTypeArg };
     }
 
     // ============================================================
@@ -788,7 +810,8 @@ export class Game {
     }
 
     async notif_newCycle(args) {
-        document.getElementById('wl-current-cycle').textContent = args.cycle_num;
+        document.getElementById('wld_current-cycle').textContent = args.cycle_num;
+        this.updateFirstPlayerToken(args.first_player);
     }
 
     async notif_cardsDrawn(args) {
@@ -805,11 +828,11 @@ export class Game {
 
     async notif_playerDrew(args) {
         // Update hand count display
-        const countEl = document.getElementById(`wl-hand-count-${args.player_id}`);
+        const countEl = document.getElementById(`wld_hand-count-${args.player_id}`);
         if (countEl) countEl.textContent = args.handCount;
 
         // Update deck count
-        const deckEl = document.getElementById('wl-deck-count');
+        const deckEl = document.getElementById('wld_deck-count');
         if (deckEl) deckEl.textContent = args.deckCount;
     }
 
@@ -831,7 +854,7 @@ export class Game {
         this.placeCardInHabitat(card, playerId);
 
         // Update hand count
-        const countEl = document.getElementById(`wl-hand-count-${playerId}`);
+        const countEl = document.getElementById(`wld_hand-count-${playerId}`);
         if (countEl) countEl.textContent = parseInt(countEl.textContent) - 1;
     }
 
@@ -848,7 +871,7 @@ export class Game {
         }
 
         // Update hand count
-        const countEl = document.getElementById(`wl-hand-count-${args.player_id}`);
+        const countEl = document.getElementById(`wld_hand-count-${args.player_id}`);
         if (countEl) countEl.textContent = parseInt(countEl.textContent) - 1;
     }
 
@@ -861,7 +884,7 @@ export class Game {
             }
         }
 
-        const countEl = document.getElementById(`wl-hand-count-${args.player_id}`);
+        const countEl = document.getElementById(`wld_hand-count-${args.player_id}`);
         if (countEl) countEl.textContent = parseInt(countEl.textContent) - 1;
     }
 
@@ -882,7 +905,7 @@ export class Game {
         }
 
         // Update hand count
-        const countEl = document.getElementById(`wl-hand-count-${args.player_id}`);
+        const countEl = document.getElementById(`wld_hand-count-${args.player_id}`);
         if (countEl) countEl.textContent = parseInt(countEl.textContent) - 1;
     }
 
@@ -903,7 +926,7 @@ export class Game {
             });
         }
 
-        const countEl = document.getElementById(`wl-hand-count-${args.player_id}`);
+        const countEl = document.getElementById(`wld_hand-count-${args.player_id}`);
         if (countEl) countEl.textContent = parseInt(countEl.textContent) - 1;
     }
 
@@ -918,7 +941,7 @@ export class Game {
         // Show cycle scores
         if (args.scores) {
             Object.entries(args.scores).forEach(([pid, cycleScore]) => {
-                const scoreEl = document.getElementById(`wl-habitat-score-${pid}`);
+                const scoreEl = document.getElementById(`wld_habitat-score-${pid}`);
                 if (scoreEl) scoreEl.textContent = `+${cycleScore} pts`;
             });
         }
@@ -934,7 +957,7 @@ export class Game {
 
     async notif_cardsDiscarded(args) {
         // Cards were discarded from hand
-        const countEl = document.getElementById(`wl-hand-count-${args.player_id}`);
+        const countEl = document.getElementById(`wld_hand-count-${args.player_id}`);
         if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent) - args.nbr);
 
         // Remove from UI if it's the current player's hand

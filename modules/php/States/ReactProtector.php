@@ -95,9 +95,13 @@ class ReactProtector extends GameState
         // Execute hunter effect
         $removedCards = $this->game->executeHunter($targetPlayerId, $lifeType);
 
-        $this->bga->notify->all("hunterResolved", clienttranslate('The Hunter removes ${nbr} ${life_type} card(s) from ${target_name}!'), [
+        $hunterPlayerId = (int)$this->game->getGameStateValue(Game::GV_PENDING_HUNTER_PLAYER);
+        $hunterPlayerName = $this->game->getPlayerNameById($hunterPlayerId);
+
+        $this->bga->notify->all("hunterResolved", clienttranslate('${hunter_name}\'s Hunter removes ${nbr} ${life_type} card(s) from ${target_name}!'), [
             'target_id' => $targetPlayerId,
             'target_name' => $this->game->getPlayerNameById($targetPlayerId),
+            'hunter_name' => $hunterPlayerName,
             'removed_cards' => $removedCards,
             'nbr' => count($removedCards),
             'life_type' => $lifeType,

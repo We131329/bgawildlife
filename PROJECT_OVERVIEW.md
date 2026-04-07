@@ -20,21 +20,21 @@ Working through the official BGA pre-release requirements in order.
 
 ### Phase 1: Game Logic & Server Side (Core Integrity)
 - [x] **Statistics (`stats.json`)**: Fixed argument order for `playerStats->inc` and `set`.
-- [ ] **Extra Time**: Ensure `giveExtraTime()` is called when giving turns (in `NextPlayer.php` and `DrawPhase.php`).
-- [x] **Game Progression**: Refine `getGameProgression()` in `Game.php` (Basic version exists).
-- [ ] **Zombie Mode**: Comprehensive audit of `zombie()` methods in all states (e.g., `ReactProtector`).
-- [ ] **Notifications**: Final review of log messages for clarity and meaningfulness.
+- [x] **Extra Time**: Ensure `giveExtraTime()` is called when giving turns (Updated in `NextPlayer.php` and `DrawPhase.php`).
+- [x] **Game Progression**: Refine `getGameProgression()` in `Game.php` (Implemented logic based on cycles and player turns).
+- [x] **Zombie Mode**: Comprehensive audit of `zombie()` methods in all states (Refined `PlayerTurn.php` and verified others).
+- [x] **Notifications**: Final review of log messages for clarity and meaningfulness (Improved `hunterResolved` and others).
 - [x] **Tiebreaking**: Implemented base-128 encoded aux score in `EndScore.php`.
-- [ ] **Database Integrity**: Verify no manual transactions or schema-changing queries (e.g., TRUNCATE) during play.
+- [x] **Database Integrity**: Verify no manual transactions or schema-changing queries (Verified queries are standard DML).
 
 ### Phase 2: User Interface & Client Side (UX & Polish)
-- [ ] **Ajax Safety**: Verify `bgaPerformAction` is only triggered by user actions, never programmatically.
-- [ ] **UI Centering**: Ensure game zone elements are centered if they don't fill horizontal space.
-- [ ] **Tooltips**: Add non-self-explanatory graphic tooltips (using `addTooltipHtml`).
-- [ ] **Translation Audit**: Ensure all strings (PHP/JS) use `clienttranslate()` or `_()`. No hardcoded strings.
-- [ ] **CSS Namespacing**: Ensure all CSS classes use a game-specific prefix (e.g., `wld_`).
-- [ ] **High Res Support**: Check for blurriness at high zoom; use `background-size` if needed.
-- [ ] **Grammar & Gender**: Review English messages for punctuation, present tense, and gender neutrality.
+- [x] **Ajax Safety**: Verify `bgaPerformAction` is only triggered by user actions (Verified in `Game.js`).
+- [x] **UI Centering**: Ensure game zone elements are centered (Added centering and max-width in CSS).
+- [x] **Tooltips**: Add non-self-explanatory graphic tooltips (Implemented using `addTooltipHtml`).
+- [x] **Translation Audit**: Ensure all strings (PHP/JS) use `clienttranslate()` or `_()` (Wrapped all hardcoded UI strings).
+- [x] **CSS Namespacing**: Ensure all CSS classes use a game-specific prefix (Renamed all `wl-` to `wld_`).
+- [x] **High Res Support**: Check for blurriness at high zoom (Added `image-rendering` optimization).
+- [x] **Grammar & Gender**: Review English messages for punctuation, present tense, and gender neutrality (Verified "their" usage).
 
 ### Phase 3: Assets, Metadata & Licensing (Packaging)
 - [ ] **License Check**: Confirm BGA has the license for WildLife.

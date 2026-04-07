@@ -53,6 +53,7 @@ class DrawPhase extends \Bga\GameFramework\States\GameState
         // Set the first player as active and start the habitat phase
         $firstPlayer = (int)$this->game->getGameStateValue(Game::GV_FIRST_PLAYER);
         $this->game->gamestate->changeActivePlayer($firstPlayer);
+        $this->game->giveExtraTime($firstPlayer);
         $this->game->setGameStateValue(Game::GV_CARDS_PLAYED_THIS_CYCLE, 0);
         $this->game->setGameStateValue(Game::GV_ACTIVE_TURN_PLAYER, $firstPlayer);
 

@@ -419,70 +419,83 @@ private function validateCardInHand(array $card, int $playerId, array $args)
 }
 
     function zombie(int $playerId) {
-        // Zombie: play a random playable card or pass
         $args = $this->getArgs();
         $playable = $args['playableCards'];
 
-        if (empty($playable)) {
-            // Must discard
+        // If no cards can be played, or we are in a mandatory discard state
+        if (empty($playable) || $args['mustDiscard']) {
             $hand = $this->game->cards->getCardsInLocation('hand', $playerId);
             $handCards = array_values($hand);
-            $cardsPlayed = $args['cardsPlayed'];
-            $toDiscard = count($handCards) - 3;
-            if ($toDiscard > 0) {
-                $discardIds = array_map(fn($c) => (int)$c['id'], array_slice($handCards, 0, $toDiscard));
-                return $this->actDiscard($discardIds, $playerId, $args);
+            
+            if ($args['mustDiscard']) {
+                // Must discard down to 3
+                $toDiscardCount = count($handCards) - 3;
+                if ($toDiscardCount > 0) {
+                    $discardIds = array_map(fn($c) => (int)$c['id'], array_slice($handCards, 0, $toDiscardCount));
+                    return $this->actDiscard(implode(',', $discardIds), $playerId, $args);
+                }
+            } else {
+                // Not mandatory, but no playable cards -> discard 1 card to pass action
+                if (!empty($handCards)) {
+                    $discardIds = [(int)$handCards[0]['id']];
+                    return $this->actDiscard(implode(',', $discardIds), $playerId, $args);
+                }
             }
+            // Absolute fallback
+            $this->game->setGameStateValue(Game::GV_CARDS_PLAYED_THIS_CYCLE, 3);
             return NextPlayer::class;
         }
 
-        // Play a random card
+        // Play a random card from playable ones
         $card = $playable[array_rand($playable)];
         $category = Game::getCardCategory($card['type']);
 
-        switch ($category) {
-            case 'life':
-                return $this->actPlayLifeCard((int)$card['id'], $playerId, $args);
-            case 'enhancer':
-                return $this->actPlayEnhancer((int)$card['id'], $playerId, $args);
-            case 'rain':
-                return $this->actPlayRain((int)$card['id'], $playerId, $args);
-            case 'catastrophe':
-                return $this->actPlayCatastrophe((int)$card['id'], $playerId, $args);
-            case 'aggressor':
-                if ($card['type'] === 'predator') {
-                    // Find a random target with life cards
-                    $others = $args['otherPlayers'];
-                    foreach ($others as $op) {
-                        if (!empty($op['habitatCards'])) {
-                            $targetCard = $op['habitatCards'][array_rand($op['habitatCards'])];
-                            return $this->actPlayPredator((int)$card['id'], (int)$op['id'], (int)$targetCard['id'], $playerId, $args);
+        try {
+            switch ($category) {
+                case 'life':
+                    return $this->actPlayLifeCard((int)$card['id'], $playerId, $args);
+                case 'enhancer':
+                    return $this->actPlayEnhancer((int)$card['id'], $playerId, $args);
+                case 'rain':
+                    return $this->actPlayRain((int)$card['id'], $playerId, $args);
+                case 'catastrophe':
+                    return $this->actPlayCatastrophe((int)$card['id'], $playerId, $args);
+                case 'aggressor':
+                    if ($card['type'] === 'predator') {
+                        foreach ($args['otherPlayers'] as $op) {
+                            if (!empty($op['habitatCards'])) {
+                                $targetCard = $op['habitatCards'][array_rand($op['habitatCards'])];
+                                return $this->actPlayPredator((int)$card['id'], (int)$op['id'], (int)$targetCard['id'], $playerId, $args);
+                            }
+                        }
+                    } elseif ($card['type'] === 'hunter') {
+                        foreach ($args['otherPlayers'] as $op) {
+                            if (!empty($op['habitatCards'])) {
+                                $lifeType = $op['habitatCards'][0]['type'];
+                                return $this->actPlayHunter((int)$card['id'], (int)$op['id'], $lifeType, $playerId, $args);
+                            }
                         }
                     }
-                    // No valid target, play a life card instead
-                    foreach ($playable as $pc) {
-                        if (Game::isLifeType($pc['type'])) {
-                            return $this->actPlayLifeCard((int)$pc['id'], $playerId, $args);
+                    // If no targets for aggressors, try playing a life card instead if possible
+                    foreach ($playable as $fallbackCard) {
+                        if (Game::isLifeType($fallbackCard['type'])) {
+                            return $this->actPlayLifeCard((int)$fallbackCard['id'], $playerId, $args);
                         }
                     }
-                } elseif ($card['type'] === 'hunter') {
-                    $others = $args['otherPlayers'];
-                    foreach ($others as $op) {
-                        if (!empty($op['habitatCards'])) {
-                            $lifeType = $op['habitatCards'][0]['type'];
-                            return $this->actPlayHunter((int)$card['id'], (int)$op['id'], $lifeType, $playerId, $args);
-                        }
-                    }
-                }
-                // Fallback: play first life card
-                foreach ($playable as $pc) {
-                    if (Game::isLifeType($pc['type'])) {
-                        return $this->actPlayLifeCard((int)$pc['id'], $playerId, $args);
-                    }
-                }
-                return NextPlayer::class;
-            default:
-                return NextPlayer::class;
+                    break;
+            }
+        } catch (\Exception $e) {
+            // If anything fails in the random choice, discard 1 card as safe fallback
+            $hand = $this->game->cards->getCardsInLocation('hand', $playerId);
+            if (!empty($hand)) {
+                $first = reset($hand);
+                return $this->actDiscard((string)$first['id'], $playerId, $args);
+            }
         }
+
+        // Final fallback to prevent hang
+        $played = (int)$this->game->getGameStateValue(Game::GV_CARDS_PLAYED_THIS_CYCLE);
+        $this->game->setGameStateValue(Game::GV_CARDS_PLAYED_THIS_CYCLE, $played + 1);
+        return NextPlayer::class;
     }
 }
