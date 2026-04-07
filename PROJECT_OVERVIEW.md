@@ -13,31 +13,53 @@ This project is a BGA implementation of "WildLife". Players compete over a serie
     - `EndCycle`: Calculates habitat scores and manages temporary card removal.
     - `EndScore`: Final tiebreaker logic using encoded cycle history.
 
-## Wrap Up & Polish Roadmap
+---
 
-### 1. Game Progression
-- **Status**: Basic `getGameProgression()` exists in `Game.php`.
-- **Goal**: Refine it to calculate progress based on the current cycle vs. total cycles (e.g., `($currentCycle - 1) / $totalCycles * 100`).
+## 🚀 Pre-Alpha Checklist Roadmap
+Working through the official BGA pre-release requirements in order.
 
-### 2. Comprehensive Zombie Mode
-- **Status**: Implemented for `MulliganPhase` and `PlayerTurn`.
-- **Goal**: Audit and add `zombie()` methods to all other state classes (`DrawPhase`, `ReactProtector`, etc.) to ensure the game never hangs if a player disconnects.
+### Phase 1: Game Logic & Server Side (Core Integrity)
+- [x] **Statistics (`stats.json`)**: Fixed argument order for `playerStats->inc` and `set`.
+- [ ] **Extra Time**: Ensure `giveExtraTime()` is called when giving turns (in `NextPlayer.php` and `DrawPhase.php`).
+- [x] **Game Progression**: Refine `getGameProgression()` in `Game.php` (Basic version exists).
+- [ ] **Zombie Mode**: Comprehensive audit of `zombie()` methods in all states (e.g., `ReactProtector`).
+- [ ] **Notifications**: Final review of log messages for clarity and meaningfulness.
+- [x] **Tiebreaking**: Implemented base-128 encoded aux score in `EndScore.php`.
+- [ ] **Database Integrity**: Verify no manual transactions or schema-changing queries (e.g., TRUNCATE) during play.
 
-### 3. Statistics (stats.json)
-- **Status**: `stats.json` is well-defined with categories like `life_cards_played`, `hunters_played`, and `highest_cycle_score`.
-- **Goal**: Ensure all PHP actions (in `PlayerTurn`, `ReactProtector`, etc.) actually call `$this->game->playerStats->inc(...)` to update these values during play.
+### Phase 2: User Interface & Client Side (UX & Polish)
+- [ ] **Ajax Safety**: Verify `bgaPerformAction` is only triggered by user actions, never programmatically.
+- [ ] **UI Centering**: Ensure game zone elements are centered if they don't fill horizontal space.
+- [ ] **Tooltips**: Add non-self-explanatory graphic tooltips (using `addTooltipHtml`).
+- [ ] **Translation Audit**: Ensure all strings (PHP/JS) use `clienttranslate()` or `_()`. No hardcoded strings.
+- [ ] **CSS Namespacing**: Ensure all CSS classes use a game-specific prefix (e.g., `wld_`).
+- [ ] **High Res Support**: Check for blurriness at high zoom; use `background-size` if needed.
+- [ ] **Grammar & Gender**: Review English messages for punctuation, present tense, and gender neutrality.
 
-### 4. Game Logs & Notifications
-- **Status**: Major actions have logs.
-- **Goal**: Review all notifications to ensure the text (e.g., `${player_name} plays ${card_name}`) provides a clear history of the game in the log panel.
+### Phase 3: Assets, Metadata & Licensing (Packaging)
+- [ ] **License Check**: Confirm BGA has the license for WildLife.
+- [ ] **Metadata Manager**: Update `gameinfos.inc.php` and upload pretty images in Metadata Manager.
+- [ ] **Game Box**: 3D version of the box with transparent background.
+- [ ] **Image Compression**: 
+    - [ ] Compress cards into "Sprites" (atlases).
+    - [ ] Ensure individual files < 4MB.
+    - [ ] Total assets size < 15MB (or indexed palette optimization).
+- [ ] **Cleanup**: Remove all unused images from the `img` directory.
+- [ ] **Sounds & Fonts**: Move assets to `sounds/` and `fonts/` folders respectively; include license `.txt` for fonts.
 
-### 5. Tiebreaking
-- **Status**: **Completed**. `EndScore.php` implements a base-128 tiebreaker, and `gameinfos.inc.php` correctly describes it as "Highest score in a single cycle".
+### Phase 4: Special Testing & Validation
+- [ ] **Minification Test**: Test game with "Use minified JS/CSS" enabled in Studio.
+- [ ] **Spectator Mode**: Test as a non-player observer (verify no private info is leaked).
+- [ ] **Replay Mode**: Test in-game replay (log clicks) and end-of-game full replay.
+- [ ] **Browser/Mobile**: Test on Chrome, Firefox, and mobile/responsive views.
+- [ ] **Realtime Mode**: Verify no time-outs occur with `giveExtraTime()`.
+- [ ] **Waiting Screen**: Verify the game starts correctly through the waiting screen.
 
-### 6. Translation Audit
-- **Status**: Most strings are wrapped.
-- **Goal**: Final pass to ensure no hardcoded English/Spanish strings remain in JS or PHP.
-
-### 7. UI Tooltips
-- **Status**: Cards are rendered but lack interactive tooltips.
-- **Goal**: Use `this.bga.tooltips.addTooltipHtml()` in `Game.js` to show card descriptions or effects when hovering over images.
+### Phase 5: Final Cleanup & Alpha Request
+- [ ] **Code Cleanup**:
+    - [ ] Remove all `console.log` (except `console.error`).
+    - [ ] Remove all PHP debug logging.
+    - [ ] Ensure copyright headers have your name.
+- [ ] **Static Analysis**: Run "Dry run build" and "Check project" in the control panel.
+- [ ] **Alpha Request**: Build a release version and click "Request ALPHA status".
+- [ ] **Email Follow-up**: Prepare info for the BGA admin email (Renaming, License, Usernames).
