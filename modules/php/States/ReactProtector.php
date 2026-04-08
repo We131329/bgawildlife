@@ -8,6 +8,7 @@ use Bga\GameFramework\States\GameState;
 use Bga\GameFramework\States\PossibleAction;
 use Bga\GameFramework\UserException;
 use Bga\Games\WildLife\Game;
+use Bga\Games\WildLife\Managers\CardManager;
 
 class ReactProtector extends GameState
 {
@@ -39,7 +40,7 @@ class ReactProtector extends GameState
             'protectors' => array_values($protectors),
             'hunterPlayerId' => $hunterPlayer,
             'hunterPlayerName' => $this->game->getPlayerNameById((int)$hunterPlayer),
-            'targetedLifeType' => Game::ID_TO_LIFE_TYPE[$lifeTypeInt] ?? 'unknown',
+            'targetedLifeType' => CardManager::ID_TO_LIFE_TYPE[$lifeTypeInt] ?? 'unknown',
         ];
     }
 
@@ -64,7 +65,7 @@ class ReactProtector extends GameState
         $this->game->bga->playerStats->inc('protectors_used', 1, $activePlayerId);
 
         $lifeTypeInt = (int)$this->game->getGameStateValue(Game::GV_PENDING_HUNTER_LIFETYPE);
-        $lifeType = Game::ID_TO_LIFE_TYPE[$lifeTypeInt] ?? 'unknown';
+        $lifeType = CardManager::ID_TO_LIFE_TYPE[$lifeTypeInt] ?? 'unknown';
 
         $this->bga->notify->all("protectorUsed", clienttranslate('${player_name} uses a Protector! ${life_type_name} animals are safe!'), [
             'player_id' => $activePlayerId,
@@ -90,7 +91,7 @@ class ReactProtector extends GameState
     {
         $targetPlayerId = $activePlayerId; // The target IS the active player in this state
         $lifeTypeInt = (int)$this->game->getGameStateValue(Game::GV_PENDING_HUNTER_LIFETYPE);
-        $lifeType = Game::ID_TO_LIFE_TYPE[$lifeTypeInt] ?? 'unknown';
+        $lifeType = CardManager::ID_TO_LIFE_TYPE[$lifeTypeInt] ?? 'unknown';
 
         // Execute hunter effect
         $removedCards = $this->game->executeHunter($targetPlayerId, $lifeType);
@@ -112,13 +113,13 @@ class ReactProtector extends GameState
         $lifeTypesRemaining = [];
         $enhancers = [];
         foreach ($habitat as $card) {
-            if (Game::isLifeType($card['type'])) $lifeTypesRemaining[$card['type']] = true;
+            if (CardManager::isLife($card['type'])) $lifeTypesRemaining[$card['type']] = true;
             if (str_starts_with($card['type'], 'enhancer_')) $enhancers[] = $card;
         }
 
         $orphaned = [];
         foreach ($enhancers as $enhancer) {
-            $target = Game::ENHANCER_TARGETS[$enhancer['type']] ?? null;
+            $target = CardManager::ENHANCER_TARGETS[$enhancer['type']] ?? null;
             if ($target && !isset($lifeTypesRemaining[$target])) {
                 $this->game->cards->moveCard((int)$enhancer['id'], 'discard');
                 $orphaned[] = $enhancer;

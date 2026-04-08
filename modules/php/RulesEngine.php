@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Bga\Games\WildLife;
 
 use Bga\GameFramework\UserException;
+use Bga\Games\WildLife\Managers\Cards;
 
 class RulesEngine
 {
@@ -13,7 +14,7 @@ class RulesEngine
     public static function canPlayCard(Game $game, int $playerId, array $card): bool
     {
         $cardType = $card['type'];
-        $category = Game::getCardCategory($cardType);
+        $category = Cards::getCategory($cardType);
 
         // Life cards, rain, aggressors, catastrophes are always playable during turn
         if (in_array($category, ['life', 'rain', 'aggressor', 'catastrophe'])) {
@@ -22,7 +23,7 @@ class RulesEngine
 
         // Enhancers: need at least 1 of the target life type, and no existing enhancer of same type
         if ($category === 'enhancer') {
-            $targetLife = Game::ENHANCER_TARGETS[$cardType] ?? null;
+            $targetLife = Cards::ENHANCER_TARGETS[$cardType] ?? null;
             if (!$targetLife) return false;
 
             $habitat = $game->cards->getCardsInLocation('habitat', $playerId);
@@ -46,10 +47,10 @@ class RulesEngine
     public static function validatePlay(Game $game, int $playerId, array $card): void
     {
         $cardType = $card['type'];
-        $category = Game::getCardCategory($cardType);
+        $category = Cards::getCategory($cardType);
 
         if ($category === 'enhancer') {
-            $targetLife = Game::ENHANCER_TARGETS[$cardType] ?? null;
+            $targetLife = Cards::ENHANCER_TARGETS[$cardType] ?? null;
             if (!$targetLife) throw new UserException('Invalid enhancer type');
 
             $habitat = $game->cards->getCardsInLocation('habitat', $playerId);

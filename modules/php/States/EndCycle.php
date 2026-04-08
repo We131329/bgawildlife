@@ -5,6 +5,7 @@ namespace Bga\Games\WildLife\States;
 
 use Bga\GameFramework\StateType;
 use Bga\Games\WildLife\Game;
+use Bga\Games\WildLife\Managers\CardManager;
 
 class EndCycle extends \Bga\GameFramework\States\GameState
 {
@@ -61,18 +62,19 @@ class EndCycle extends \Bga\GameFramework\States\GameState
             // Track which life types are present in this habitat
             $lifeTypesPresent = [];
             foreach ($habitat as $card) {
-                if (Game::isLifeType($card['type'])) {
+                if (CardManager::isLife($card['type'])) {
                     $lifeTypesPresent[$card['type']] = true;
                 }
             }
 
             foreach ($habitat as $card) {
                 $isRain = ($card['type'] === 'rain');
-                $isOrphanedEnhancer = (str_starts_with($card['type'], 'enhancer_') && !isset($lifeTypesPresent[Game::ENHANCER_TARGETS[$card['type']] ?? '']));
+                $isOrphanedEnhancer = (str_starts_with($card['type'], 'enhancer_') && !isset($lifeTypesPresent[CardManager::ENHANCER_TARGETS[$card['type']] ?? '']));
 
                 if ($isRain || $isOrphanedEnhancer) {
                     $this->game->cards->moveCard((int)$card['id'], 'discard');
-                    $cardsRemoved[] = ['card' => $card, 'player_id' => $pid];
+                    $removedCardInfo = ['card' => $card, 'player_id' => $pid];
+                    $cardsRemoved[] = $removedCardInfo;
                 }
             }
         }

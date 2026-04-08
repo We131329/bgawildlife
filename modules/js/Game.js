@@ -858,6 +858,15 @@ export class Game {
         if (countEl) countEl.textContent = parseInt(countEl.textContent) - 1;
     }
 
+    async notif_enhancerLost(args) {
+        // Remove all orphaned enhancers sent by the server
+        if (args.removed_cards) {
+            args.removed_cards.forEach(card => {
+                this.removeCardFromHabitat(card.id);
+            });
+        }
+    }
+
     async notif_predatorPlayed(args) {
         // Remove the targeted card from habitat
         this.removeCardFromHabitat(args.removed_card.id);

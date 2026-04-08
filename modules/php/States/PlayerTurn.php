@@ -8,6 +8,9 @@ use Bga\GameFramework\States\GameState;
 use Bga\GameFramework\States\PossibleAction;
 use Bga\GameFramework\UserException;
 use Bga\Games\WildLife\Game;
+use Bga\Games\WildLife\Managers\CardManager;
+use Bga\Games\WildLife\Managers\HabitatManager;
+use Bga\Games\WildLife\Managers\PlayerManager;
 
 class PlayerTurn extends GameState
 {
@@ -50,7 +53,7 @@ class PlayerTurn extends GameState
         $result = [];
         foreach ($players as $pid => $pdata) {
             $habitat = $this->game->cards->getCardsInLocation('habitat', (int)$pid);
-            $lifeCards = array_filter($habitat, fn($c) => Game::isLifeType($c['type']));
+            $lifeCards = array_filter($habitat, fn($c) => CardManager::isLife($c['type']));
             $result[$pid] = [
                 'id' => $pid,
                 'name' => $pdata['name'],
@@ -70,7 +73,7 @@ class PlayerTurn extends GameState
         $card = $this->game->cards->getCard($card_id);
         $this->validateCardInHand($card, $activePlayerId, $args);
 
-        if (!Game::isLifeType($card['type'])) {
+        if (!CardManager::isLife($card['type'])) {
             throw new UserException('This is not a life card');
         }
 
@@ -80,7 +83,7 @@ class PlayerTurn extends GameState
         // Update stats
         $this->game->bga->playerStats->inc('life_cards_played', 1, $activePlayerId);
 
-        $info = Game::getCardTypeInfo($card['type'], (int)$card['type_arg']);
+        $info = CardManager::getInfo($card['type'], (int)$card['type_arg']);
         $this->bga->notify->all("cardPlayedToHabitat", clienttranslate('${player_name} plays ${card_name} to their habitat'), [
             'player_id' => $activePlayerId,
             'player_name' => $this->game->getPlayerNameById($activePlayerId),
@@ -124,7 +127,7 @@ class PlayerTurn extends GameState
         // Update stats
         $this->game->bga->playerStats->inc('enhancers_played', 1, $activePlayerId);
 
-        $info = Game::getCardTypeInfo($card['type'], (int)$card['type_arg']);
+        $info = CardManager::getInfo($card['type'], (int)$card['type_arg']);
         $this->bga->notify->all("cardPlayedToHabitat", clienttranslate('${player_name} plays ${card_name} enhancer'), [
             'player_id' => $activePlayerId,
             'player_name' => $this->game->getPlayerNameById($activePlayerId),
@@ -200,7 +203,7 @@ class PlayerTurn extends GameState
                 'nbr' => count($orphaned),
             ]);
         }
-        $removedInfo = Game::getCardTypeInfo($removedCard['type'], (int)$removedCard['type_arg']);
+        $removedInfo = CardManager::getInfo($removedCard['type'], (int)$removedCard['type_arg']);
         $this->bga->notify->all("predatorPlayed", clienttranslate('${player_name} plays a Predator! ${target_name} loses ${card_name}'), [
             'player_id' => $activePlayerId,
             'player_name' => $this->game->getPlayerNameById($activePlayerId),
@@ -229,7 +232,7 @@ class PlayerTurn extends GameState
         if ($target_player_id === $activePlayerId) {
             throw new UserException('You cannot target yourself');
         }
-        if (!Game::isLifeType($life_type)) {
+        if (!CardManager::isLife($life_type)) {
             throw new UserException('Invalid life type');
         }
 
@@ -238,7 +241,7 @@ class PlayerTurn extends GameState
         $this->game->setGameStateValue(Game::GV_PENDING_HUNTER_TARGET, $target_player_id);
 
         // Encode life type as int for storage
-        $this->game->setGameStateValue(Game::GV_PENDING_HUNTER_LIFETYPE, Game::LIFE_TYPE_TO_ID[$life_type] ?? 0);
+        $this->game->setGameStateValue(Game::GV_PENDING_HUNTER_LIFETYPE, CardManager::LIFE_TYPE_TO_ID[$life_type] ?? 0);
 
         // Discard the hunter card
         $this->game->cards->moveCard($card_id, 'discard');
@@ -279,7 +282,7 @@ class PlayerTurn extends GameState
         $removedCards = $this->game->executeCatastrophe($card['type'], $activePlayerId);
 
         // For catastrophes, check every player for orphaned enhancers
-        foreach ($this->game->getPlayerIds() as $pid) {
+        foreach (PlayerManager::getIds() as $pid) {
             $orphaned = $this->cleanupOrphanedEnhancers($pid);
             foreach ($orphaned as $oCard) {
                 $removedCards[] = ['card' => $oCard, 'player_id' => $pid];
@@ -292,7 +295,7 @@ class PlayerTurn extends GameState
         // Update stats
         $this->game->bga->playerStats->inc('catastrophes_played', 1, $activePlayerId);
 
-        $info = Game::getCardTypeInfo($card['type'], (int)$card['type_arg']);
+        $info = CardManager::getInfo($card['type'], (int)$card['type_arg']);
         $this->bga->notify->all("catastrophePlayed", clienttranslate('${player_name} plays ${card_name}! ${nbr} card(s) removed from all habitats!'), [
             'player_id' => $activePlayerId,
             'player_name' => $this->game->getPlayerNameById($activePlayerId),
@@ -376,13 +379,13 @@ class PlayerTurn extends GameState
         $lifeTypes = [];
         $enhancers = [];
         foreach ($habitat as $card) {
-            if (Game::isLifeType($card['type'])) $lifeTypes[$card['type']] = true;
+            if (CardManager::isLife($card['type'])) $lifeTypes[$card['type']] = true;
             if (str_starts_with($card['type'], 'enhancer_')) $enhancers[] = $card;
         }
 
         $removed = [];
         foreach ($enhancers as $enhancer) {
-            $target = Game::ENHANCER_TARGETS[$enhancer['type']] ?? null;
+            $target = CardManager::ENHANCER_TARGETS[$enhancer['type']] ?? null;
             if ($target && !isset($lifeTypes[$target])) {
                 $this->game->cards->moveCard((int)$enhancer['id'], 'discard');
                 $removed[] = $enhancer;
@@ -448,7 +451,7 @@ private function validateCardInHand(array $card, int $playerId, array $args)
 
         // Play a random card from playable ones
         $card = $playable[array_rand($playable)];
-        $category = Game::getCardCategory($card['type']);
+        $category = CardManager::getCategory($card['type']);
 
         try {
             switch ($category) {
@@ -478,7 +481,7 @@ private function validateCardInHand(array $card, int $playerId, array $args)
                     }
                     // If no targets for aggressors, try playing a life card instead if possible
                     foreach ($playable as $fallbackCard) {
-                        if (Game::isLifeType($fallbackCard['type'])) {
+                        if (CardManager::isLife($fallbackCard['type'])) {
                             return $this->actPlayLifeCard((int)$fallbackCard['id'], $playerId, $args);
                         }
                     }
