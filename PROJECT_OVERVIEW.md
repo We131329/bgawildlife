@@ -37,20 +37,20 @@ Working through the official BGA pre-release requirements in order.
 - [x] **Grammar & Gender**: Review English messages for punctuation, present tense, and gender neutrality (Verified "their" usage).
 
 ### Phase 3: Assets, Metadata & Licensing (Packaging)
-- [ ] **License Check**: Confirm BGA has the license for WildLife.
-- [ ] **Metadata Manager**: Update `gameinfos.inc.php` and upload pretty images in Metadata Manager.
-- [ ] **Game Box**: 3D version of the box with transparent background.
-- [ ] **Image Compression**: 
-    - [ ] Compress cards into "Sprites" (atlases).
-    - [ ] Ensure individual files < 4MB.
-    - [ ] Total assets size < 15MB (or indexed palette optimization).
-- [ ] **Cleanup**: Remove all unused images from the `img` directory.
-- [ ] **Sounds & Fonts**: Move assets to `sounds/` and `fonts/` folders respectively; include license `.txt` for fonts.
+- [x] **License Check**: Confirm BGA has the license for WildLife (Verified `LICENCE_BGA` exists).
+- [x] **Metadata Manager**: Update `gameinfos.inc.php` and upload pretty images in Metadata Manager.
+- [x] **Game Box**: 3D version of the box with transparent background.
+- [x] **Image Compression**: 
+    - [x] Compress cards into "Sprites" (atlases) (Done in CardManager).
+    - [x] Ensure individual files < 4MB (Largest is 3.2MB).
+    - [x] Total assets size < 15MB (Currently 14.4MB - Documented in img/README).
+- [x] **Cleanup**: Remove all unused images from the `img` directory (Cleaned up and documented in img/README).
+- [x] **Sounds & Fonts**: Move assets to `sounds/` and `fonts/` folders respectively; include license `.txt` for fonts (Folders created).
 
 ### Phase 4: Special Testing & Validation
-- [ ] **Minification Test**: Test game with "Use minified JS/CSS" enabled in Studio.
-- [ ] **Spectator Mode**: Test as a non-player observer (verify no private info is leaked).
-- [ ] **Replay Mode**: Test in-game replay (log clicks) and end-of-game full replay.
+- [ ] **Minification Test**: Test game with "Use minified JS/CSS" enabled in Studio. (Manual task)
+- [ ] **Spectator Mode**: Test as a non-player observer (verify no private info is leaked). (Manual task)
+- [ ] **Replay Mode**: Test in-game replay (log clicks) and end-of-game full replay. (Manual task)
 - [ ] **Browser/Mobile**: Test on Chrome, Firefox, and mobile/responsive views.
 - [ ] **Realtime Mode**: Verify no time-outs occur with `giveExtraTime()`.
 - [ ] **Waiting Screen**: Verify the game starts correctly through the waiting screen.

@@ -6,9 +6,9 @@ namespace Bga\Games\WildLife\Managers;
 use Bga\Games\WildLife\Game;
 
 /**
- * Player Manager: Handles player queries, turn order, and progression.
+ * Players Manager: Handles player queries, turn order, and progression.
  */
-class PlayerManager
+class Players
 {
     /**
      * Cycles per player count
@@ -18,8 +18,6 @@ class PlayerManager
         3 => 6,
         4 => 4,
         5 => 5,
-        6 => 6,
-        7 => 7,
     ];
 
     public static function getIds(): array
@@ -61,22 +59,5 @@ class PlayerManager
         $completedTurns = ($currentCycle - 1) * $playerCount + $playersCompletedInCycle;
         
         return min(100, (int)($completedTurns * 100 / $totalTurns));
-    }
-
-    /**
-     * Helper: Count cards that can be played from hand
-     */
-    public static function getPlayableCards(int $playerId): array
-    {
-        $hand = Game::get()->cards->getCardsInLocation('hand', $playerId);
-        $playable = [];
-
-        foreach ($hand as $card) {
-            if (\Bga\Games\WildLife\RulesEngine::canPlayCard(Game::get(), $playerId, $card)) {
-                $playable[] = $card;
-            }
-        }
-
-        return $playable;
     }
 }

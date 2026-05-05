@@ -256,13 +256,12 @@ export class Game {
 
             // Opponent habitat zones
             if (parseInt(player.id) !== currentPlayerId) {
-                const tokenImg = this.bga.images.getImgUrl('cards/special/firstToken.jpg');
                 document.getElementById('wld_habitats').insertAdjacentHTML('beforeend', `
                     <div class="wld_opponent-habitat" id="wld_habitat-${player.id}">
                         <div class="wld_habitat-header" style="border-color: #${player.color}">
                             <strong>${player.name}</strong>
                             <span class="wld_habitat-score" id="wld_habitat-score-${player.id}">0 ${_('pts')}</span>
-                            <div class="wld_first-player-token" id="wld_token_${player.id}" style="background-image: url('${tokenImg}')"></div>
+                            <div class="wld_first-player-token" id="wld_token_${player.id}"></div>
                         </div>
                         <div class="wld_habitat-grid" id="wld_habitat-grid-${player.id}">
                             <div class="wld_habitat-column wld_habitat-extras" id="wld_hab-${player.id}-extras"><div class="wld_col-label">🌧️ ${_('Rain')}</div></div>
@@ -278,10 +277,9 @@ export class Game {
 
         // My habitat
         const myHab = document.getElementById('wld_my-habitat');
-        const myTokenImg = this.bga.images.getImgUrl('cards/special/firstToken.jpg');
         myHab.innerHTML = `
             <div class="wld_habitat-header" style="border-bottom:none; padding:0; margin-bottom:10px;">
-                <div class="wld_first-player-token" id="wld_token_${currentPlayerId}" style="background-image: url('${myTokenImg}')"></div>
+                <div class="wld_first-player-token" id="wld_token_${currentPlayerId}"></div>
             </div>
             <div class="wld_habitat-grid wld_my-grid">
                 <div class="wld_habitat-column wld_my-col wld_habitat-extras" id="wld_my-hab-extras"><div class="wld_col-label">🌧️ ${_('Rain')}</div></div>
@@ -318,12 +316,8 @@ export class Game {
         const sizeClass = size === 'small' ? 'wld_card-small' : 'wld_card';
 
         const name = info ? info.name : card.type;
-        let image = info ? info.image : '';
-
-        // Enforce Predator art and allow Hunter variety from the threats folder
-        if (card.type === 'predator') {
-            image = 'cards/threats/predator.jpg';
-        }
+        const sprite = info ? info.sprite : '';
+        const spriteIndex = info ? info.sprite_index : 0;
 
         const div = document.createElement('div');
         div.className = `${sizeClass} wld_card-${category}`;
@@ -333,16 +327,32 @@ export class Game {
         div.dataset.cardTypeArg = card.type_arg;
         div.style.borderColor = borderColor;
 
-        if (image) {
-            const imgUrl = this.bga.images.getImgUrl(image);
-            div.innerHTML = `<img class="wld_card-img" src="${imgUrl}" alt="${name}" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" /><div class="wld_card-fallback" style="display:none">${name}</div>`;
+        if (sprite) {
+            const imgUrl = this.bga.images.getImgUrl(sprite);
+            let cols = 3;
+            let rows = 4;
+            if (sprite === 'enhancers.png' || sprite === 'threats.png') {
+                cols = 4;
+                rows = 4;
+            } else if (sprite === 'special.png') {
+                cols = 3;
+                rows = 1;
+            }
+
+            const x = (spriteIndex % cols) * (100 / (cols - 1 || 1));
+            const y = Math.floor(spriteIndex / cols) * (100 / (rows - 1 || 1));
+
+            div.innerHTML = `
+                <div class="wld_card-img" style="background-image: url('${imgUrl}'); background-position: ${x}% ${y}%; background-size: ${cols * 100}% ${rows * 100}%;"></div>
+                <div class="wld_card-fallback" style="display:none">${name}</div>
+            `;
         } else {
             div.innerHTML = `<div class="wld_card-fallback">${name}</div>`;
         }
 
         // Add point indicator for life cards
         if (category === 'life' && info) {
-            const pts = info.points || '?';
+            const pts = info.points || 0;
             const icon = LIFE_TYPE_ICONS[card.type] || '';
             div.innerHTML += `<div class="wld_card-points">${icon} ${pts === 0 ? '📊' : '🐾'.repeat(pts)}</div>`;
         }

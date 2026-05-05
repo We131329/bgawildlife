@@ -9,8 +9,7 @@ C:\Users\PC PRIDE WHITE WOLF\OneDrive\Documentos2\BGA\wildlife\
 ├── gamepreferences.json        # User preferences configuration
 ├── stats.json                  # Game statistics definitions
 ├── wildlife.css                # Main stylesheet
-├── img/                        # Graphic assets
-│   └── cards/                  # Card artwork (subdivided by type)
+├── img/                        # Graphic assets (sprite sheets)
 ├── modules/
 │   ├── php/
 │   │   ├── Game.php            # Main server-side logic and card definitions

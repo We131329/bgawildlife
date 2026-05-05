@@ -217,7 +217,9 @@ declare class Images {
 
 declare class Sounds {
   /**
-   * Load a sound file to be used with play.
+   * Load a sound file (from img folder) to be used with play.
+   * 
+   * @deprecated move the sounds in the `sounds` folder to benefit from autoloading, then remove this call.
    * 
    * @param {string} id the id to be used by play
    * @param {string} fileName the file name, without extension (there should be a .ogg and a .mp3 with that file name in the img folder). If unset, it will try with the id as file name.
@@ -225,11 +227,25 @@ declare class Sounds {
   load(id: string, fileName: string): void;
 
   /**
-   * Play the sound with the given id.
+   * Play the sound with the given id (or filename without extension for preloaded sounds in the `sounds` folder).
    * 
    * @param {string} id the sound id
    */
   play(id: string): void;
+
+  /**
+   * Tell the interface to not preload specific sounds in your sound root directory.
+   * 
+   * @param {string[]} sounds the filenames (without extension)
+   */
+  dontPreloadSounds(sounds: string[]): void;
+
+  /**
+   * Tell the interface to preload specific sounds in your sound directory.
+   * 
+   * @param {string[]} sounds the filenames (without extension)
+   */
+  preloadSounds(sounds: string[]): void;
 }
 
 declare class UserPreferences {

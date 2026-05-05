@@ -1,9 +1,21 @@
-This directory contains all graphic files for your game:
- - jpg and png formats are recommended, gif is also accepted
- - do not use subdirectories
- - use the "CSS sprite" technique for faster loading
- - use a reasonable resolution for the web and compression
+# WildLife: The Card Game - Image Asset Documentation
 
-Typically, this directory should contain fewer than 10 files, with no file larger than 4 Mb.
+This directory contains the graphical assets for the game, organized as sprite sheets (atlases) to optimize performance and memory.
 
-See: http://en.doc.boardgamearena.com/Game_art:_img_directory for more details.
+## Sprite Sheets (Atlases)
+
+| File | Category | Usage |
+| :--- | :--- | :--- |
+| `small.png` | Life Cards | Small Animals (Fox, Squirrel, Raccoon). |
+| `big.png` | Life Cards | Big Animals (Bear, Elk, Deer, Boar). |
+| `flying.png` | Life Cards | Flying Animals (Owl, Eagle, Robin). |
+| `aquatic.png` | Life Cards | Aquatic Animals (Koi, Axolotl, Salmon). |
+| `enhancers.png` | Enhancers | Multipliers for all life categories. |
+| `threats.png` | Aggressors | Predators, Hunters, and Catastrophes (Fire/Pollution). |
+| `special.png` | Utilities | Rain, Protectors, and First Player Token (CSS). |
+
+## Implementation Notes
+
+- **PHP Logic**: Definitions for sprite indices are managed in `modules/php/Managers/CardManager.php`.
+- **CSS Styling**: The first player token background is handled in `wildlife.css` under the `.wld_first-player-token` class.
+- **JS Rendering**: Sprite URLs and coordinate calculations are performed in `Game.js` within the `createCardElement` method.
