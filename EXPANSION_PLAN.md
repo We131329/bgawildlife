@@ -92,3 +92,8 @@ If an expansion adds a new phase (e.g., "Exploration Phase" after the draw), add
 4. Update `HabitatManager.php` scoring logic.
 5. Update `Game.js` rendering and CSS.
 6. (Optional) Add new states if the expansion changes the flow.
+
+---
+
+## 5. Tentative Future Improvements
+- [ ] **Zombie Mode Upgrade (Level 2 - Greedy)**: Improve the `PlayerTurn` zombie logic to prioritize high-value plays or protection of high-scoring cards instead of purely random actions.

@@ -1,4 +1,9 @@
 <?php
+/**
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * WildLife: The Card Game implementation
+ * Implementation: Erickbond
+ */
 declare(strict_types=1);
 
 namespace Bga\Games\WildLife;

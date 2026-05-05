@@ -48,18 +48,18 @@ Working through the official BGA pre-release requirements in order.
 - [x] **Sounds & Fonts**: Move assets to `sounds/` and `fonts/` folders respectively; include license `.txt` for fonts (Folders created).
 
 ### Phase 4: Special Testing & Validation
-- [ ] **Minification Test**: Test game with "Use minified JS/CSS" enabled in Studio. (Manual task)
-- [ ] **Spectator Mode**: Test as a non-player observer (verify no private info is leaked). (Manual task)
-- [ ] **Replay Mode**: Test in-game replay (log clicks) and end-of-game full replay. (Manual task)
-- [ ] **Browser/Mobile**: Test on Chrome, Firefox, and mobile/responsive views.
-- [ ] **Realtime Mode**: Verify no time-outs occur with `giveExtraTime()`.
-- [ ] **Waiting Screen**: Verify the game starts correctly through the waiting screen.
+- [x] **Minification Test**: Test game with "Use minified JS/CSS" enabled in Studio. (Manual task)
+- [x] **Spectator Mode**: Test as a non-player observer (verify no private info is leaked). (Manual task)
+- [x] **Replay Mode**: Test in-game replay (log clicks) and end-of-game full replay. (Manual task)
+- [x] **Browser/Mobile**: Test on Chrome, Firefox, and mobile/responsive views.
+- [x] **Realtime Mode**: Verify no time-outs occur with `giveExtraTime()`.
+- [x] **Waiting Screen**: Verify the game starts correctly through the waiting screen.
 
 ### Phase 5: Final Cleanup & Alpha Request
 - [ ] **Code Cleanup**:
-    - [ ] Remove all `console.log` (except `console.error`).
-    - [ ] Remove all PHP debug logging.
-    - [ ] Ensure copyright headers have your name.
+    - [x] Remove all `console.log` (except `console.error`).
+    - [x] Remove all PHP debug logging.
+    - [x] Ensure copyright headers have your name.
 - [ ] **Static Analysis**: Run "Dry run build" and "Check project" in the control panel.
 - [ ] **Alpha Request**: Build a release version and click "Request ALPHA status".
 - [ ] **Email Follow-up**: Prepare info for the BGA admin email (Renaming, License, Usernames).

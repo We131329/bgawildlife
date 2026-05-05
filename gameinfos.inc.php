@@ -1,4 +1,9 @@
 <?php
+/**
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * WildLife: The Card Game implementation
+ * Implementation: Erickbond
+ */
 
 /*
  * From this file, you can edit the various meta-information of your game.
@@ -14,13 +19,13 @@ $gameinfos = [
     'game_name' => "Wild Life: The Card Game",
 
     // Game publisher (use empty string if there is no publisher)
-    'publisher' => '',
+    'publisher' => 'Wild Life Games ',
 
     // Url of game publisher website
-    'publisher_website' => '',
+    'publisher_website' => 'https://boardgamegeek.com/boardgamepublisher/49493/wild-life-games',
 
     // Board Game Geek ID of the publisher
-    'publisher_bgg_id' => 0,
+    'publisher_bgg_id' => 49493,
 
     // Board game geek ID of the game
     'bgg_id' => 304666,

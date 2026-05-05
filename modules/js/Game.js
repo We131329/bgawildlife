@@ -1,6 +1,7 @@
 /**
  * Wild Life: The Card Game - BGA Implementation
  * JavaScript Game Logic & UI
+ * Implementation: Erickbond
  */
 
 // Life type labels for display
@@ -202,7 +203,6 @@ class ReactProtectorState {
 // ============================================================
 export class Game {
     constructor(bga) {
-        console.log('Wild Life constructor');
         this.bga = bga;
 
         // Register states
@@ -221,7 +221,6 @@ export class Game {
     }
 
     setup(gamedatas) {
-        console.log("Starting Wild Life setup");
         this.gamedatas = gamedatas;
         this.cardTypes = gamedatas.cardTypes;
 
@@ -302,7 +301,6 @@ export class Game {
         this.renderHand(gamedatas.hand);
 
         this.setupNotifications();
-        console.log("Ending Wild Life setup");
     }
 
     // ============================================================
@@ -806,7 +804,6 @@ export class Game {
     // ============================================================
 
     setupNotifications() {
-        console.log('Wild Life notifications setup');
         this.bga.notifications.setupPromiseNotifications({
             mulliganResult: 500
         });
