@@ -58,7 +58,7 @@ class EndScore extends \Bga\GameFramework\States\GameState
                 $count++;
                 if ($count >= 4) break; // Max 4 cycles to fit in 32-bit INT
             }
-            \Bga\GameFramework\Table::DbQuery("UPDATE `player` SET `player_score_aux` = {$aux} WHERE `player_id` = {$pid}");
+            $this->bga->playerScoreAux->set($pid, $aux);
         }
 
         $this->bga->notify->all("gameEnd", clienttranslate('Game over! Final scores are tallied.'), []);

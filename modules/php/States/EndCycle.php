@@ -104,9 +104,9 @@ class EndCycle extends \Bga\GameFramework\States\GameState
     private function getPlayerScores(): array
     {
         $scores = [];
-        $result = \Bga\GameFramework\Table::getCollectionFromDB("SELECT `player_id`, `player_score` FROM `player` pip");
-        foreach ($result as $row) {
-            $scores[$row['player_id']] = (int)$row['player_score'];
+        $playerIds = $this->bga->players->getIds();
+        foreach ($playerIds as $pid) {
+            $scores[$pid] = (int)$this->bga->playerScore->get($pid);
         }
         return $scores;
     }

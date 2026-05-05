@@ -56,10 +56,10 @@ Working through the official BGA pre-release requirements in order.
 - [x] **Waiting Screen**: Verify the game starts correctly through the waiting screen.
 
 ### Phase 5: Final Cleanup & Alpha Request
-- [ ] **Code Cleanup**:
+- [x] **Code Cleanup**:
     - [x] Remove all `console.log` (except `console.error`).
     - [x] Remove all PHP debug logging.
     - [x] Ensure copyright headers have your name.
-- [ ] **Static Analysis**: Run "Dry run build" and "Check project" in the control panel.
-- [ ] **Alpha Request**: Build a release version and click "Request ALPHA status".
+- [x] **Static Analysis**: Run "Dry run build" and "Check project" in the control panel (Passed - fixed score counter and aspect ratio issues).
+- [ ] **Alpha Request**: Build a release version and click "Request ALPHA status" (Pending Meta Data Images).
 - [ ] **Email Follow-up**: Prepare info for the BGA admin email (Renaming, License, Usernames).
